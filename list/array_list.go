@@ -2,251 +2,222 @@ package list
 
 import (
 	"fmt"
-	"github.com/google/go-cmp/cmp"
-	"github.com/rewantsoni/go-datastructures/errors"
-	"github.com/rewantsoni/go-datastructures/utils"
+	"strings"
 )
 
 type ArrayList struct {
-	arrayListType   string
 	capacity        int
 	upperLoadFactor float64
 	lowerLoadFactor float64
 	scalingFactor   int
 	size            int
-	data            []interface{}
+	data            []int
 }
 
-func NewArrayList(elements ...interface{}) (*ArrayList, error) {
+func NewArrayList(elements ...int) *ArrayList {
 	al := &ArrayList{
-		arrayListType:   utils.NA,
 		size:            nought,
 		capacity:        initialCapacity,
 		upperLoadFactor: upperLoadFactor,
 		lowerLoadFactor: lowerLoadFactor,
 		scalingFactor:   scalingFactor,
-		data:            make([]interface{}, initialCapacity)}
+		data:            make([]int, initialCapacity),
+	}
 
 	if len(elements) == 0 {
-		return al, nil
+		return al
 	}
 
-	if err := al.AddAll(elements...); err != nil {
-		return nil, err
+	if !al.AddAll(elements...) {
+		return nil
 	}
 
-	return al, nil
+	return al
 }
 
-// Size returns the size of the array
 func (al *ArrayList) Size() int {
 	return al.size
 }
 
-func (al *ArrayList) isEmpty() bool {
-	if al.size == 0 {
-		return true
-	}
-	return false
+func (al *ArrayList) IsEmpty() bool {
+	return al.size == 0
 }
 
-// Add adds an element to the arraylist
-func (al *ArrayList) Add(element interface{}) error {
-	return al.AddAll(element)
+func (al *ArrayList) Add(element int) bool {
+	return al.AddAt(al.size, element)
 }
 
-// AddAll adds multiple element to the arraylist
-func (al *ArrayList) AddAll(elements ...interface{}) error {
-	return addAll(al, elements...)
+func (al *ArrayList) AddAll(elements ...int) bool {
+	return addAll(al.size, al, elements...)
 }
 
-func (al *ArrayList) AddAt(pos int, element interface{}) error {
-	if al.isEmpty() {
-		if pos != 0 {
-			return errors.EmptyListError
-		}
-		err := al.Add(element)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	elementType := utils.GetTypeName(element)
-	if elementType != al.arrayListType {
-		return errors.TypeMismatchError(al.arrayListType, elementType)
-	}
-
-	if pos >= 0 && pos <= al.size+1 {
-		for i := al.size + 1; i > pos; i-- {
-			al.data[i] = al.data[i-1]
-		}
-		al.data[pos] = element
-		al.size++
-		checkAndIncreaseLimit(al)
-		return nil
-	}
-
-	return errors.IndexOutOfBoundError(pos)
+func (al *ArrayList) AddAt(pos int, element int) bool {
+	return addAll(pos, al, element)
 }
 
-// GetAt returns the element at an index
-func (al *ArrayList) GetAt(i int) (interface{}, error) {
-	if al.isEmpty() {
-		return nil, errors.EmptyListError
+func (al *ArrayList) GetAt(i int) (int, bool) {
+	if al.IsEmpty() || i < 0 || i >= al.size {
+		return -1, false
 	}
 
-	if isIndexInRange(al.size, i) {
-		return al.data[i], nil
-	}
-
-	return nil, errors.IndexOutOfBoundError(i)
+	return al.data[i], true
 }
 
-// Contains returns if element is present in the arraylist
-func (al *ArrayList) Contains(element interface{}) (bool, error) {
-	if al.isEmpty() {
-		return false, errors.EmptyListError
-	}
-	elementType := utils.GetTypeName(element)
-	if al.arrayListType != elementType {
-		return false, errors.TypeMismatchError(al.arrayListType, elementType)
-	}
-	for _, d := range al.data {
-		if cmp.Equal(d, element) {
-			return true, nil
-		}
-	}
-	return false, nil
+func (al *ArrayList) Contains(element int) bool {
+	return al.IndexOf(element) != -1
 }
 
-// IndexOf returns the first index of an element if present along with an error
-func (al *ArrayList) IndexOf(element interface{}) (int, error) {
+func (al *ArrayList) IndexOf(element int) int {
 	return find(al, element)
 }
 
-// LastIndexOf returns the last index of an element if present along with an error
-func (al *ArrayList) LastIndexOf(element interface{}) (int, error) {
-	return findLast(al, element)
-}
-
-// FindAllOccurrencesOf returns all the occurrences of an element
-func (al *ArrayList) FindAllOccurrencesOf(element interface{}) ([]int, error) {
-	return findAll(al, element)
-}
-
-// Replace updates the first occurrence of an element with the new one
-func (al *ArrayList) Replace(old interface{}, new interface{}) error {
-	i, err := al.IndexOf(old)
-	if err != nil {
-		return err
-	}
-
-	newType := utils.GetTypeName(new)
-	if newType != al.arrayListType {
-		return errors.TypeMismatchError(al.arrayListType, newType)
+func (al *ArrayList) Replace(old int, new int) bool {
+	i := al.IndexOf(old)
+	if i == -1 {
+		return false
 	}
 
 	al.data[i] = new
-	return nil
+	return true
 }
 
-// ReplaceFromEnd updates the last occurrence of an element with the new one
-func (al *ArrayList) ReplaceFromEnd(old interface{}, new interface{}) error {
-	i, err := al.LastIndexOf(old)
-	if err != nil {
-		return err
-	}
-
-	newType := utils.GetTypeName(new)
-	if newType != al.arrayListType {
-		return errors.TypeMismatchError(al.arrayListType, newType)
+func (al *ArrayList) Set(i int, new int) bool {
+	if al.IsEmpty() || i < 0 || i >= al.size {
+		return false
 	}
 
 	al.data[i] = new
-	return nil
-}
-
-// ReplaceAllOccurrencesOf updates all the occurrence of an element with the new one
-func (al *ArrayList) ReplaceAllOccurrencesOf(old interface{}, new interface{}) error {
-	indexes, err := al.FindAllOccurrencesOf(old)
-	if err != nil {
-		return err
-	}
-
-	newType := utils.GetTypeName(new)
-	if newType != al.arrayListType {
-		return errors.TypeMismatchError(al.arrayListType, newType)
-	}
-
-	for _, i := range indexes {
-		al.data[i] = new
-	}
-	return nil
-}
-
-// Set updates the value at a particular index
-func (al *ArrayList) Set(i int, new interface{}) error {
-	if al.isEmpty() {
-		return errors.EmptyListError
-	}
-
-	newType := utils.GetTypeName(new)
-	if newType != al.arrayListType {
-		return errors.TypeMismatchError(al.arrayListType, newType)
-	}
-
-	if isIndexInRange(al.size, i) {
-		al.data[i] = new
-		return nil
-	}
-
-	return errors.IndexOutOfBoundError(i)
+	return true
 }
 
 // Remove removes the first occurrence of the element
-func (al *ArrayList) Remove(element interface{}) (bool, error) {
-	i, err := al.IndexOf(element)
-	if err != nil {
-		return false, err
+func (al *ArrayList) Remove(element int) bool {
+	i := al.IndexOf(element)
+	if i == -1 {
+		return false
 	}
 
 	shiftLeft(al, i)
-	return true, nil
+
+	return true
 }
 
-// RemoveFromEnd removes the last occurrence of the element
-func (al *ArrayList) RemoveFromEnd(element interface{}) (bool, error) {
-	i, err := al.LastIndexOf(element)
-	if err != nil {
-		return false, err
+func (al *ArrayList) RemoveAt(i int) (int, bool) {
+	if al.IsEmpty() || i < 0 || i >= al.size {
+		return -1, false
 	}
 
+	e := al.data[i]
 	shiftLeft(al, i)
-	return true, nil
+
+	return e, true
 }
 
-// RemoveAt removes the element at an index
-func (al *ArrayList) RemoveAt(i int) (interface{}, error) {
-	if al.isEmpty() {
-		return nil, errors.EmptyListError
-	}
+func (al *ArrayList) RetainAll(elements ...int) List {
 
-	if isIndexInRange(al.size, i) {
-		e := al.data[i]
-		shiftLeft(al, i)
-		return e, nil
-	}
-	return nil, errors.IndexOutOfBoundError(i)
-}
-
-
-func (al *ArrayList) Print() {
-	fmt.Println("Array Type: ", al.arrayListType)
-	fmt.Println("Array Size: ", al.size)
-	fmt.Println("Array Capacity: ", al.capacity)
-	fmt.Println("Printing Array: ")
+	temp := NewArrayList(elements...)
 	for i := 0; i < al.size; i++ {
-		fmt.Print(al.data[i], ", ")
+		if !temp.Contains(al.data[i]) {
+			al.RemoveAt(i)
+			i--
+		}
 	}
+	return al
+}
+
+func (al *ArrayList) String() string {
+	sb := strings.Builder{}
+
+	for i := 0; i < al.size; i++ {
+		sb.WriteString(fmt.Sprintf("%d ", al.data[i]))
+	}
+
+	return sb.String()
+}
+
+func (al *ArrayList) ReplaceAll(f func(e int) int) {
+	for i := 0; i < al.size; i++ {
+		al.data[i] = f(al.data[i])
+	}
+}
+
+func checkAndIncreaseLimit(al *ArrayList) {
+	if al.size >= int(float64(al.capacity)*al.upperLoadFactor) {
+		al.capacity *= al.scalingFactor
+		al.data = resize(al.capacity, al.data)
+	}
+}
+
+func checkAndDecreaseLimit(al *ArrayList) {
+	if al.size <= int(float64(al.capacity)*al.lowerLoadFactor) && al.capacity != initialCapacity {
+		al.capacity /= al.scalingFactor
+		al.data = resize(al.capacity, al.data)
+	}
+}
+
+func addAll(pos int, al *ArrayList, data ...int) bool {
+
+	for i, d := range data {
+		if !add(pos+i, al, d) {
+			return false
+		}
+	}
+	return true
+}
+
+func add(pos int, al *ArrayList, e int) bool {
+
+	if !(pos >= 0 && pos <= al.size) {
+		return false
+	}
+
+	checkAndIncreaseLimit(al)
+
+	for i := al.Size(); i > pos; i-- {
+		al.data[i] = al.data[i-1]
+	}
+
+	al.data[pos] = e
+	al.size++
+
+	return true
+}
+
+func find(al *ArrayList, val int) int {
+
+	if al.IsEmpty() {
+		return -1
+	}
+
+	for i := 0; i < al.size; i++ {
+		if al.data[i] == val {
+			return i
+		}
+	}
+	return -1
+}
+
+func resize(capacity int, data []int) []int {
+	temp := make([]int, capacity)
+
+	sz := len(data)
+	if capacity < sz {
+		sz = capacity
+	}
+
+	for i := 0; i < sz; i++ {
+		temp[i] = data[i]
+	}
+	return temp
+}
+
+func shiftLeft(al *ArrayList, index int) {
+
+	checkAndDecreaseLimit(al)
+
+	for i := index; i < al.size; i++ {
+		al.data[i] = al.data[i+1]
+	}
+
+	al.size--
 }
