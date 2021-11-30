@@ -2,6 +2,7 @@ package list
 
 import (
 	"errors"
+	"github.com/rewantsoni/go-datastructures/iterator"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -434,6 +435,54 @@ func TestArrayListContains(t *testing.T) {
 	}
 }
 
+func TestArrayListContainsAll(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() bool
+		expectedResult bool
+	}{
+		{
+			name: "test when list is empty",
+			actualResult: func() bool {
+				al := NewArrayList()
+				return al.ContainsAll(1, 2, 3)
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test when list contains all the elements",
+			actualResult: func() bool {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				return al.ContainsAll(1, 2, 5)
+			},
+			expectedResult: true,
+		},
+		{
+			name: "test when list does not contain the elements",
+			actualResult: func() bool {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				return al.ContainsAll(10, 1)
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test when list does not contain the elements",
+			actualResult: func() bool {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				return al.ContainsAll(1, 3, 10)
+			},
+			expectedResult: false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res := testCase.actualResult()
+			assert.Equal(t, testCase.expectedResult, res)
+		})
+	}
+}
+
 func TestArrayListIndexOf(t *testing.T) {
 	testCases := []struct {
 		name           string
@@ -781,5 +830,159 @@ func TestArrayListReplaceAll(t *testing.T) {
 			assert.Equal(t, testCase.expectedResult(), res)
 		})
 	}
+}
 
+func TestArrayListIterator(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() iterator.Iterator
+		expectedResult iterator.Iterator
+	}{
+		{
+			name: "test Iterator with empty array",
+			actualResult: func() iterator.Iterator {
+				al := NewArrayList()
+				return al.Iterator()
+			},
+			expectedResult: &arrayListIterator{
+				currentIndex: 0,
+				al:           NewArrayList(),
+			},
+		},
+		{
+			name: "test Iterator with elements",
+			actualResult: func() iterator.Iterator {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				return al.Iterator()
+			},
+			expectedResult: &arrayListIterator{
+				currentIndex: 0,
+				al:           NewArrayList(1, 2, 3, 4, 5),
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res := testCase.actualResult()
+			assert.Equal(t, testCase.expectedResult, res)
+		})
+	}
+}
+
+func TestArrayListIteratorHasNext(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() bool
+		expectedResult bool
+	}{
+		{
+			name: "test IteratorHasNext with empty array",
+			actualResult: func() bool {
+				al := NewArrayList()
+				it := al.Iterator()
+				return it.HasNext()
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test Iterator with elements",
+			actualResult: func() bool {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				it := al.Iterator()
+				return it.HasNext()
+			},
+
+			expectedResult: true,
+		},
+		{
+			name: "test Iterator with elements after array is empty",
+			actualResult: func() bool {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				it := al.Iterator()
+				it.Next()
+				it.Next()
+				it.Next()
+				it.Next()
+				it.Next()
+				return it.HasNext()
+			},
+
+			expectedResult: false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res := testCase.actualResult()
+			assert.Equal(t, testCase.expectedResult, res)
+		})
+	}
+}
+
+func TestArrayListIteratorNext(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() interface{}
+		expectedResult interface{}
+	}{
+		{
+			name: "test when list is empty",
+			actualResult: func() interface{} {
+				al := NewArrayList()
+				it := al.Iterator()
+				var res []interface{}
+				res = append(res, it.Next())
+				return res
+			},
+			expectedResult: []interface {}{interface {}(nil)},
+		},
+		{
+			name: "test when list is not empty",
+			actualResult: func() interface{} {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				it := al.Iterator()
+				return it.Next()
+			},
+			expectedResult: 1,
+		},
+		{
+			name: "test when list is not empty get all the element",
+			actualResult: func() interface{} {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				it := al.Iterator()
+				var res []interface{}
+				res = append(res, it.Next())
+				res = append(res, it.Next())
+				res = append(res, it.Next())
+				res = append(res, it.Next())
+				res = append(res, it.Next())
+				return res
+			},
+			expectedResult: []interface{}{1, 2, 3, 4, 5},
+		},
+		{
+			name: "test when list is not empty get extra elements",
+			actualResult: func() interface{} {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				it := al.Iterator()
+				var res []interface{}
+				res = append(res, it.Next())
+				res = append(res, it.Next())
+				res = append(res, it.Next())
+				res = append(res, it.Next())
+				res = append(res, it.Next())
+				res = append(res, it.Next())
+				return res
+			},
+			expectedResult: []interface {}{1, 2, 3, 4, 5, interface {}(nil)},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res := testCase.actualResult()
+			assert.Equal(t, testCase.expectedResult, res)
+		})
+	}
 }

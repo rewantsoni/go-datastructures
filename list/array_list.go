@@ -2,6 +2,7 @@ package list
 
 import (
 	"fmt"
+	"github.com/rewantsoni/go-datastructures/iterator"
 	"strings"
 )
 
@@ -12,6 +13,11 @@ type ArrayList struct {
 	scalingFactor   int
 	size            int
 	data            []int
+}
+
+type arrayListIterator struct {
+	currentIndex int
+	al           *ArrayList
 }
 
 func NewArrayList(elements ...int) *ArrayList {
@@ -33,6 +39,13 @@ func NewArrayList(elements ...int) *ArrayList {
 	}
 
 	return al
+}
+
+func newArrayListIterator(al *ArrayList) *arrayListIterator {
+	return &arrayListIterator{
+		currentIndex: 0,
+		al:           al,
+	}
 }
 
 func (al *ArrayList) Size() int {
@@ -67,6 +80,15 @@ func (al *ArrayList) Contains(element int) bool {
 	return al.IndexOf(element) != -1
 }
 
+func (al *ArrayList) ContainsAll(elements ...int) bool {
+	for _, element := range elements {
+		if !al.Contains(element) {
+			return false
+		}
+	}
+	return true
+}
+
 func (al *ArrayList) IndexOf(element int) int {
 	return find(al, element)
 }
@@ -90,7 +112,6 @@ func (al *ArrayList) Set(i int, new int) bool {
 	return true
 }
 
-// Remove removes the first occurrence of the element
 func (al *ArrayList) Remove(element int) bool {
 	i := al.IndexOf(element)
 	if i == -1 {
@@ -125,6 +146,16 @@ func (al *ArrayList) RetainAll(elements ...int) List {
 	return al
 }
 
+func (al *ArrayList) ReplaceAll(f func(e int) int) {
+	for i := 0; i < al.size; i++ {
+		al.data[i] = f(al.data[i])
+	}
+}
+
+func (al *ArrayList) Iterator() iterator.Iterator {
+	return newArrayListIterator(al)
+}
+
 func (al *ArrayList) String() string {
 	sb := strings.Builder{}
 
@@ -135,10 +166,21 @@ func (al *ArrayList) String() string {
 	return sb.String()
 }
 
-func (al *ArrayList) ReplaceAll(f func(e int) int) {
-	for i := 0; i < al.size; i++ {
-		al.data[i] = f(al.data[i])
+func (ali *arrayListIterator) HasNext() bool {
+	return ali.currentIndex < ali.al.size
+}
+
+func (ali *arrayListIterator) Next() interface{} {
+	if !ali.HasNext() {
+		return nil
 	}
+	//TODO: error?
+	e, err := ali.al.GetAt(ali.currentIndex)
+	if !err {
+		return nil
+	}
+	ali.currentIndex++
+	return e
 }
 
 func checkAndIncreaseLimit(al *ArrayList) {
