@@ -1,5 +1,7 @@
 package list
 
+import "github.com/rewantsoni/go-datastructures/iterator"
+
 type List interface {
 	Size() int
 	IsEmpty() bool
@@ -14,7 +16,11 @@ type List interface {
 	Remove(element int) bool
 	RemoveAt(i int) (int, bool)
 	RetainAll(elements ...int) List
+	RemoveAll(elements ...int) List
 	ReplaceAll(f func(e int) int)
+	Iterator() iterator.Iterator
 }
 
-
+//TODO: RetainAll, TDD
+//TODO: ContainAll(elements ...), ReplaceAll(func(e)), RemoveALL(elements ...){RetainALL}
+//TODO: iterator.. iterateList

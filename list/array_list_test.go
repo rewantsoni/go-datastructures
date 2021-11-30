@@ -776,6 +776,80 @@ func TestArrayListRemoveAt(t *testing.T) {
 	}
 }
 
+func TestArrayListRetainAll(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() *ArrayList
+		expectedResult func() *ArrayList
+	}{
+		{
+			name: "test when arrayList is empty",
+			actualResult: func() *ArrayList {
+				al := NewArrayList()
+				al.RetainAll(1, 2, 3)
+				return al
+			},
+			expectedResult: func() *ArrayList {
+				return NewArrayList()
+			},
+		},
+		{
+			name: "test when arrayList is not empty",
+			actualResult: func() *ArrayList {
+				al := NewArrayList(1, 2, 3, 4, 5, 1)
+				al.RetainAll(1, 2, 3)
+				return al
+			},
+			expectedResult: func() *ArrayList {
+				return NewArrayList(1, 2, 3, 1)
+			},
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res := testCase.actualResult()
+			assert.Equal(t, testCase.expectedResult(), res)
+		})
+	}
+}
+
+func TestArrayListRemoveAll(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() *ArrayList
+		expectedResult func() *ArrayList
+	}{
+		{
+			name: "test when arrayList is empty",
+			actualResult: func() *ArrayList {
+				al := NewArrayList()
+				al.RemoveAll(1, 2, 3)
+				return al
+			},
+			expectedResult: func() *ArrayList {
+				return NewArrayList()
+			},
+		},
+		{
+			name: "test when arrayList is not empty",
+			actualResult: func() *ArrayList {
+				al := NewArrayList(1, 2, 3, 4, 5, 1)
+				al.RemoveAll(1, 2, 3)
+				return al
+			},
+			expectedResult: func() *ArrayList {
+				return NewArrayList(4,5)
+			},
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res := testCase.actualResult()
+			assert.Equal(t, testCase.expectedResult(), res)
+		})
+	}
+}
+
 func TestArrayListReplaceAll(t *testing.T) {
 	testMultiply := func(e int) int {
 		return e * 2
@@ -935,7 +1009,7 @@ func TestArrayListIteratorNext(t *testing.T) {
 				res = append(res, it.Next())
 				return res
 			},
-			expectedResult: []interface {}{interface {}(nil)},
+			expectedResult: []interface{}{interface{}(nil)},
 		},
 		{
 			name: "test when list is not empty",
@@ -975,7 +1049,7 @@ func TestArrayListIteratorNext(t *testing.T) {
 				res = append(res, it.Next())
 				return res
 			},
-			expectedResult: []interface {}{1, 2, 3, 4, 5, interface {}(nil)},
+			expectedResult: []interface{}{1, 2, 3, 4, 5, interface{}(nil)},
 		},
 	}
 

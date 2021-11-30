@@ -135,15 +135,11 @@ func (al *ArrayList) RemoveAt(i int) (int, bool) {
 }
 
 func (al *ArrayList) RetainAll(elements ...int) List {
+	return filterArrayList(al, true, elements...)
+}
 
-	temp := NewArrayList(elements...)
-	for i := 0; i < al.size; i++ {
-		if !temp.Contains(al.data[i]) {
-			al.RemoveAt(i)
-			i--
-		}
-	}
-	return al
+func (al *ArrayList) RemoveAll(elements ...int) List {
+	return filterArrayList(al, false, elements...)
 }
 
 func (al *ArrayList) ReplaceAll(f func(e int) int) {
@@ -174,11 +170,12 @@ func (ali *arrayListIterator) Next() interface{} {
 	if !ali.HasNext() {
 		return nil
 	}
-	//TODO: error?
+
 	e, err := ali.al.GetAt(ali.currentIndex)
 	if !err {
 		return nil
 	}
+
 	ali.currentIndex++
 	return e
 }
@@ -262,4 +259,28 @@ func shiftLeft(al *ArrayList, index int) {
 	}
 
 	al.size--
+}
+
+func filterArrayList(al *ArrayList, retain bool, elements ...int) List {
+	temp := NewArrayList()
+	a := make(map[int]bool)
+
+	for _, e := range elements {
+		a[e] = true
+	}
+
+	for i := 0; i < al.size; i++ {
+		if retain {
+			if a[al.data[i]] {
+				temp.Add(al.data[i])
+			}
+		} else {
+			if !a[al.data[i]] {
+				temp.Add(al.data[i])
+			}
+		}
+	}
+
+	*al = *temp
+	return al
 }
