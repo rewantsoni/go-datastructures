@@ -58,15 +58,15 @@ func (al *ArrayList) IsEmpty() bool {
 }
 
 func (al *ArrayList) Add(element int) bool {
-	return addAll(al.size, al, element)
+	return al.addAll(al.size, element)
 }
 
 func (al *ArrayList) AddAll(elements ...int) bool {
-	return addAll(al.size, al, elements...)
+	return al.addAll(al.size, elements...)
 }
 
 func (al *ArrayList) AddAt(index int, element int) bool {
-	return addAll(index, al, element)
+	return al.addAll(index, element)
 }
 
 func (al *ArrayList) GetAt(index int) int {
@@ -91,7 +91,7 @@ func (al *ArrayList) ContainsAll(elements ...int) bool {
 }
 
 func (al *ArrayList) IndexOf(element int) int {
-	return find(al, element)
+	return al.find(element)
 }
 
 func (al *ArrayList) Replace(oldElement int, newElement int) bool {
@@ -125,7 +125,7 @@ func (al *ArrayList) Remove(element int) bool {
 		return false
 	}
 
-	shiftLeft(al, index)
+	al.shiftLeft(index)
 
 	return true
 }
@@ -136,17 +136,17 @@ func (al *ArrayList) RemoveAt(index int) (int, bool) {
 	}
 
 	e := al.data[index]
-	shiftLeft(al, index)
+	al.shiftLeft(index)
 
 	return e, true
 }
 
 func (al *ArrayList) RetainAll(elements ...int) {
-	filterArrayList(al, true, elements...)
+	al.filterArrayList(true, NewArrayList(elements...), 0, 0, al.size)
 }
 
 func (al *ArrayList) RemoveAll(elements ...int) {
-	filterArrayList(al, false, elements...)
+	al.filterArrayList(false, NewArrayList(elements...), 0, 0, al.size)
 }
 
 func (al *ArrayList) ReplaceAll(operator operators.UnaryOperator) {
@@ -180,37 +180,37 @@ func (ali *arrayListIterator) Next() int {
 	return e
 }
 
-func checkAndIncreaseLimit(al *ArrayList) {
+func (al *ArrayList) checkAndIncreaseLimit() {
 	if al.size >= int(float64(al.capacity)*al.upperLoadFactor) {
 		al.capacity *= al.scalingFactor
 		al.data = resize(al.capacity, al.data)
 	}
 }
 
-func checkAndDecreaseLimit(al *ArrayList) {
+func (al *ArrayList) checkAndDecreaseLimit() {
 	if al.size <= int(float64(al.capacity)*al.lowerLoadFactor) && al.capacity != initialCapacity {
 		al.capacity /= al.scalingFactor
 		al.data = resize(al.capacity, al.data)
 	}
 }
 
-func addAll(index int, al *ArrayList, data ...int) bool {
+func (al *ArrayList) addAll(index int, data ...int) bool {
 
 	for i, d := range data {
-		if !add(index+i, al, d) {
+		if !al.add(index+i, d) {
 			return false
 		}
 	}
 	return true
 }
 
-func add(index int, al *ArrayList, e int) bool {
+func (al *ArrayList) add(index int, e int) bool {
 
 	if !(index >= 0 && index <= al.size) {
 		return false
 	}
 
-	checkAndIncreaseLimit(al)
+	al.checkAndIncreaseLimit()
 
 	for i := al.size; i > index; i-- {
 		al.data[i] = al.data[i-1]
@@ -222,7 +222,7 @@ func add(index int, al *ArrayList, e int) bool {
 	return true
 }
 
-func find(al *ArrayList, element int) int {
+func (al *ArrayList) find(element int) int {
 
 	if al.IsEmpty() {
 		return -1
@@ -234,6 +234,42 @@ func find(al *ArrayList, element int) int {
 		}
 	}
 	return -1
+}
+
+func (al *ArrayList) shiftLeft(index int) {
+
+	al.checkAndDecreaseLimit()
+
+	for i := index; i < al.size; i++ {
+		al.data[i] = al.data[i+1]
+	}
+
+	al.size--
+}
+
+func (al *ArrayList) filterArrayList(retain bool, elements *ArrayList, i int, j int, size int) {
+	if i == size {
+		return
+	}
+
+	if elements.Contains(al.data[i]) {
+		if retain {
+			al.data[j] = al.data[i]
+			j++
+		} else {
+			al.size--
+		}
+	}
+
+	if !elements.Contains(al.data[i]) {
+		if !retain {
+			al.data[j] = al.data[i]
+			j++
+		} else {
+			al.size--
+		}
+	}
+	al.filterArrayList(retain, elements, i+1, j, size)
 }
 
 func resize(capacity int, data []int) []int {
@@ -248,41 +284,4 @@ func resize(capacity int, data []int) []int {
 		temp[i] = data[i]
 	}
 	return temp
-}
-
-func shiftLeft(al *ArrayList, index int) {
-
-	checkAndDecreaseLimit(al)
-
-	for i := index; i < al.size; i++ {
-		al.data[i] = al.data[i+1]
-	}
-
-	al.size--
-}
-
-func filterArrayList(al *ArrayList, retain bool, elements ...int) {
-	//Without extra space
-	temp := NewArrayList()
-	a := make(map[int]bool)
-	//1,2,1
-	//1
-	//1,1-->
-	for _, e := range elements {
-		a[e] = true
-	}
-
-	for i := 0; i < al.size; i++ {
-		if retain {
-			if a[al.data[i]] {
-				temp.Add(al.data[i])
-			}
-		} else {
-			if !a[al.data[i]] {
-				temp.Add(al.data[i])
-			}
-		}
-	}
-
-	*al = *temp
 }

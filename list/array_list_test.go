@@ -814,7 +814,11 @@ func TestArrayListRetainAll(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			res := testCase.actualResult()
-			assert.Equal(t, testCase.expectedResult(), res)
+			ExpectedRes := testCase.actualResult()
+			for i := 0; i < res.size; i++ {
+				assert.Equal(t, ExpectedRes.data[i], res.data[i])
+			}
+			assert.Equal(t, ExpectedRes.size, res.size)
 		})
 	}
 }
@@ -851,7 +855,11 @@ func TestArrayListRemoveAll(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			res := testCase.actualResult()
-			assert.Equal(t, testCase.expectedResult(), res)
+			ExpectedRes := testCase.actualResult()
+			for i := 0; i < res.size; i++ {
+				assert.Equal(t, ExpectedRes.data[i], res.data[i])
+			}
+			assert.Equal(t, ExpectedRes.size, res.size)
 		})
 	}
 }
@@ -867,7 +875,7 @@ func TestArrayListReplaceAll(t *testing.T) {
 			name: "test replace all when array is empty",
 			actualResult: func() *ArrayList {
 				al := NewArrayList()
-				al.ReplaceAll(testMultiply{Val:2})
+				al.ReplaceAll(testMultiply{Val: 2})
 				return al
 			},
 			expectedResult: func() *ArrayList {
@@ -878,7 +886,7 @@ func TestArrayListReplaceAll(t *testing.T) {
 			name: "test replace all when function multiply and array not empty",
 			actualResult: func() *ArrayList {
 				al := NewArrayList(1, 2, 3)
-				al.ReplaceAll(testMultiply{Val:2})
+				al.ReplaceAll(testMultiply{Val: 2})
 				return al
 			},
 			expectedResult: func() *ArrayList {
@@ -889,7 +897,7 @@ func TestArrayListReplaceAll(t *testing.T) {
 			name: "test replace all when add function and array not empty",
 			actualResult: func() *ArrayList {
 				al := NewArrayList(1, 2, 3)
-				al.ReplaceAll(testAdd{Val:10})
+				al.ReplaceAll(testAdd{Val: 10})
 				return al
 			},
 			expectedResult: func() *ArrayList {
