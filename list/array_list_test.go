@@ -2,6 +2,7 @@ package list
 
 import (
 	"errors"
+	"fmt"
 	"github.com/rewantsoni/go-datastructures/iterator"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -107,6 +108,8 @@ func TestArrayListSize(t *testing.T) {
 		},
 	}
 
+	//newArrayListBuilder(size = 100, random = true, incremental = true)
+
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			size := testCase.actualResult()
@@ -119,20 +122,20 @@ func TestArrayListSize(t *testing.T) {
 func TestArrayListAdd(t *testing.T) {
 	testCases := []struct {
 		name              string
-		actualResult      func() (int, bool, *ArrayList)
-		expectedArrayList func() *ArrayList
+		actualResult      func() (int, bool, List)
+		expectedArrayList func() List
 		expectedResult    bool
 		expectedSize      int
 	}{
 		{
 			name: "test Size is 1 after adding one element",
-			actualResult: func() (int, bool, *ArrayList) {
+			actualResult: func() (int, bool, List) {
 				al := NewArrayList()
 				res := al.Add(1)
 				return al.Size(), res, al
 			},
 			expectedSize: 1,
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				al := &ArrayList{
 					size:            1,
 					capacity:        16,
@@ -147,7 +150,7 @@ func TestArrayListAdd(t *testing.T) {
 		},
 		{
 			name: "test Size is 2 after adding two element",
-			actualResult: func() (int, bool, *ArrayList) {
+			actualResult: func() (int, bool, List) {
 				al := NewArrayList()
 
 				res := al.Add(1)
@@ -156,7 +159,7 @@ func TestArrayListAdd(t *testing.T) {
 				return al.Size(), res, al
 			},
 			expectedSize: 2,
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				al := &ArrayList{
 					size:            2,
 					capacity:        16,
@@ -185,20 +188,20 @@ func TestArrayListAdd(t *testing.T) {
 func TestArrayListAddAll(t *testing.T) {
 	testCases := []struct {
 		name              string
-		actualResult      func() (int, bool, *ArrayList)
-		expectedArrayList func() *ArrayList
+		actualResult      func() (int, bool, List)
+		expectedArrayList func() List
 		expectedResult    bool
 		expectedSize      int
 	}{
 		{
 			name: "test Size is 5 after adding five element",
-			actualResult: func() (int, bool, *ArrayList) {
+			actualResult: func() (int, bool, List) {
 				al := NewArrayList()
 				res := al.AddAll(1, 2, 3, 4, 5)
 				return al.Size(), res, al
 			},
 			expectedSize: 5,
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				al := &ArrayList{
 					size:            5,
 					capacity:        16,
@@ -213,7 +216,7 @@ func TestArrayListAddAll(t *testing.T) {
 		},
 		{
 			name: "test Size is 17 after adding seventeen element",
-			actualResult: func() (int, bool, *ArrayList) {
+			actualResult: func() (int, bool, List) {
 				al := NewArrayList()
 				data := make([]int, 17)
 				for i := 0; i < 17; i++ {
@@ -223,7 +226,7 @@ func TestArrayListAddAll(t *testing.T) {
 				return al.Size(), res, al
 			},
 			expectedSize: 17,
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				al := &ArrayList{
 					size:            17,
 					capacity:        32,
@@ -334,63 +337,66 @@ func TestArrayListAddAt(t *testing.T) {
 func TestArrayListGetAt(t *testing.T) {
 	testCases := []struct {
 		name           string
-		actualResult   func() (int, bool)
+		actualResult   func() int
 		expectedResult int
-		expectedBool   bool
+		expectPanic    bool
 	}{
 		{
 			name: "test get when list is empty",
-			actualResult: func() (int, bool) {
+			actualResult: func() int {
 				al := NewArrayList()
-				return al.GetAt(0)
+				fmt.Println("al:")
+				return al.GetAt(7)
 			},
-			expectedResult: -1,
-			expectedBool:   false,
+			expectPanic: true,
 		},
 		{
 			name: "test get first index when list has elements",
-			actualResult: func() (int, bool) {
+			actualResult: func() int {
 				al := NewArrayList(1, 2, 3, 4, 5)
 				return al.GetAt(0)
 			},
 			expectedResult: 1,
-			expectedBool:   true,
 		},
 		{
 			name: "test get last index when list has elements",
-			actualResult: func() (int, bool) {
+			actualResult: func() int {
 				al := NewArrayList(1, 2, 3, 4, 5)
 				return al.GetAt(4)
 			},
 			expectedResult: 5,
-			expectedBool:   true,
 		},
 		{
 			name: "test get when index is out of bond and positive",
-			actualResult: func() (int, bool) {
+			actualResult: func() int {
 				al := NewArrayList(1, 2, 3, 4, 5)
 				return al.GetAt(5)
 			},
-			expectedResult: -1,
-			expectedBool:   false,
+			expectPanic: true,
 		},
 		{
 			name: "test get when index is out of bond and negative",
-			actualResult: func() (int, bool) {
+			actualResult: func() int {
 				al := NewArrayList(1, 2, 3, 4, 5)
 				return al.GetAt(-1)
 			},
-			expectedResult: -1,
-			expectedBool:   false,
+			expectPanic: true,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			res, b := testCase.actualResult()
+			defer func() {
+				r := recover()
+				if (r != nil) != testCase.expectPanic {
+					t.Errorf("GetAt() paniced when it didn't expect to panic")
+				}
+			}()
 
-			assert.Equal(t, testCase.expectedBool, b)
-			assert.Equal(t, testCase.expectedResult, res)
+			res := testCase.actualResult()
+			if !testCase.expectPanic {
+				assert.Equal(t, testCase.expectedResult, res)
+			}
 		})
 	}
 }
@@ -575,7 +581,7 @@ func TestArrayListReplace(t *testing.T) {
 				return al, res
 			},
 			expectedResult: func() *ArrayList {
-				return NewArrayList(4, 2, 1, 4, 5)
+				return NewArrayList(4, 2, 4, 4, 5)
 			},
 			expectedBool: true,
 		},
@@ -838,7 +844,7 @@ func TestArrayListRemoveAll(t *testing.T) {
 				return al
 			},
 			expectedResult: func() *ArrayList {
-				return NewArrayList(4,5)
+				return NewArrayList(4, 5)
 			},
 		},
 	}
@@ -851,12 +857,6 @@ func TestArrayListRemoveAll(t *testing.T) {
 }
 
 func TestArrayListReplaceAll(t *testing.T) {
-	testMultiply := func(e int) int {
-		return e * 2
-	}
-	testAdd := func(e int) int {
-		return e + 10
-	}
 
 	testCases := []struct {
 		name           string
@@ -867,7 +867,7 @@ func TestArrayListReplaceAll(t *testing.T) {
 			name: "test replace all when array is empty",
 			actualResult: func() *ArrayList {
 				al := NewArrayList()
-				al.ReplaceAll(testMultiply)
+				al.ReplaceAll(testMultiply{Val:2})
 				return al
 			},
 			expectedResult: func() *ArrayList {
@@ -878,7 +878,7 @@ func TestArrayListReplaceAll(t *testing.T) {
 			name: "test replace all when function multiply and array not empty",
 			actualResult: func() *ArrayList {
 				al := NewArrayList(1, 2, 3)
-				al.ReplaceAll(testMultiply)
+				al.ReplaceAll(testMultiply{Val:2})
 				return al
 			},
 			expectedResult: func() *ArrayList {
@@ -889,7 +889,7 @@ func TestArrayListReplaceAll(t *testing.T) {
 			name: "test replace all when add function and array not empty",
 			actualResult: func() *ArrayList {
 				al := NewArrayList(1, 2, 3)
-				al.ReplaceAll(testAdd)
+				al.ReplaceAll(testAdd{Val:10})
 				return al
 			},
 			expectedResult: func() *ArrayList {
@@ -999,6 +999,7 @@ func TestArrayListIteratorNext(t *testing.T) {
 		name           string
 		actualResult   func() interface{}
 		expectedResult interface{}
+		expectPanic    bool
 	}{
 		{
 			name: "test when list is empty",
@@ -1009,7 +1010,7 @@ func TestArrayListIteratorNext(t *testing.T) {
 				res = append(res, it.Next())
 				return res
 			},
-			expectedResult: []interface{}{interface{}(nil)},
+			expectPanic: true,
 		},
 		{
 			name: "test when list is not empty",
@@ -1049,14 +1050,22 @@ func TestArrayListIteratorNext(t *testing.T) {
 				res = append(res, it.Next())
 				return res
 			},
-			expectedResult: []interface{}{1, 2, 3, 4, 5, interface{}(nil)},
+			expectPanic: true,
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
+			defer func() {
+				r := recover()
+				if (r != nil) != testCase.expectPanic {
+					t.Errorf("Next() paniced when it didn't expect to panic")
+				}
+			}()
 			res := testCase.actualResult()
-			assert.Equal(t, testCase.expectedResult, res)
+			if !testCase.expectPanic {
+				assert.Equal(t, testCase.expectedResult, res)
+			}
 		})
 	}
 }

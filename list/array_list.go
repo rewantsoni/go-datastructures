@@ -3,6 +3,7 @@ package list
 import (
 	"fmt"
 	"github.com/rewantsoni/go-datastructures/iterator"
+	"github.com/rewantsoni/go-datastructures/operators"
 	"strings"
 )
 
@@ -57,23 +58,23 @@ func (al *ArrayList) IsEmpty() bool {
 }
 
 func (al *ArrayList) Add(element int) bool {
-	return al.AddAt(al.size, element)
+	return addAll(al.size, al, element)
 }
 
 func (al *ArrayList) AddAll(elements ...int) bool {
 	return addAll(al.size, al, elements...)
 }
 
-func (al *ArrayList) AddAt(pos int, element int) bool {
-	return addAll(pos, al, element)
+func (al *ArrayList) AddAt(index int, element int) bool {
+	return addAll(index, al, element)
 }
 
-func (al *ArrayList) GetAt(i int) (int, bool) {
-	if al.IsEmpty() || i < 0 || i >= al.size {
-		return -1, false
+func (al *ArrayList) GetAt(index int) int {
+	if al.IsEmpty() || index < 0 || index >= al.size {
+		panic(fmt.Sprintf("panic: index %d is out of bound length is %d", index, al.size))
 	}
 
-	return al.data[i], true
+	return al.data[index]
 }
 
 func (al *ArrayList) Contains(element int) bool {
@@ -93,58 +94,64 @@ func (al *ArrayList) IndexOf(element int) int {
 	return find(al, element)
 }
 
-func (al *ArrayList) Replace(old int, new int) bool {
-	i := al.IndexOf(old)
-	if i == -1 {
+func (al *ArrayList) Replace(oldElement int, newElement int) bool {
+	if al.IsEmpty() {
 		return false
 	}
 
-	al.data[i] = new
-	return true
+	ok := false
+	for i := 0; i < al.size; i++ {
+		if al.data[i] == oldElement {
+			al.data[i] = newElement
+			ok = true
+		}
+	}
+
+	return ok
 }
 
-func (al *ArrayList) Set(i int, new int) bool {
-	if al.IsEmpty() || i < 0 || i >= al.size {
+func (al *ArrayList) Set(index int, newElement int) bool {
+	if al.IsEmpty() || index < 0 || index >= al.size {
 		return false
 	}
 
-	al.data[i] = new
+	al.data[index] = newElement
 	return true
 }
 
 func (al *ArrayList) Remove(element int) bool {
-	i := al.IndexOf(element)
-	if i == -1 {
+	index := al.IndexOf(element)
+	if index == -1 {
 		return false
 	}
 
-	shiftLeft(al, i)
+	shiftLeft(al, index)
 
 	return true
 }
 
-func (al *ArrayList) RemoveAt(i int) (int, bool) {
-	if al.IsEmpty() || i < 0 || i >= al.size {
+func (al *ArrayList) RemoveAt(index int) (int, bool) {
+	if al.IsEmpty() || index < 0 || index >= al.size {
 		return -1, false
 	}
 
-	e := al.data[i]
-	shiftLeft(al, i)
+	e := al.data[index]
+	shiftLeft(al, index)
 
 	return e, true
 }
 
-func (al *ArrayList) RetainAll(elements ...int) List {
-	return filterArrayList(al, true, elements...)
+func (al *ArrayList) RetainAll(elements ...int) {
+	filterArrayList(al, true, elements...)
 }
 
-func (al *ArrayList) RemoveAll(elements ...int) List {
-	return filterArrayList(al, false, elements...)
+func (al *ArrayList) RemoveAll(elements ...int) {
+	filterArrayList(al, false, elements...)
 }
 
-func (al *ArrayList) ReplaceAll(f func(e int) int) {
+func (al *ArrayList) ReplaceAll(operator operators.UnaryOperator) {
 	for i := 0; i < al.size; i++ {
-		al.data[i] = f(al.data[i])
+		al.data[i] = operator.Apply(al.data[i])
 	}
 }
 
@@ -166,15 +173,8 @@ func (ali *arrayListIterator) HasNext() bool {
 	return ali.currentIndex < ali.al.size
 }
 
-func (ali *arrayListIterator) Next() interface{} {
-	if !ali.HasNext() {
-		return nil
-	}
-
-	e, err := ali.al.GetAt(ali.currentIndex)
-	if !err {
-		return nil
-	}
+func (ali *arrayListIterator) Next() int {
+	e := ali.al.GetAt(ali.currentIndex)
 
 	ali.currentIndex++
 	return e
@@ -194,42 +194,42 @@ func checkAndDecreaseLimit(al *ArrayList) {
 	}
 }
 
-func addAll(pos int, al *ArrayList, data ...int) bool {
+func addAll(index int, al *ArrayList, data ...int) bool {
 
 	for i, d := range data {
-		if !add(pos+i, al, d) {
+		if !add(index+i, al, d) {
 			return false
 		}
 	}
 	return true
 }
 
-func add(pos int, al *ArrayList, e int) bool {
+func add(index int, al *ArrayList, e int) bool {
 
-	if !(pos >= 0 && pos <= al.size) {
+	if !(index >= 0 && index <= al.size) {
 		return false
 	}
 
 	checkAndIncreaseLimit(al)
 
-	for i := al.Size(); i > pos; i-- {
+	for i := al.size; i > index; i-- {
 		al.data[i] = al.data[i-1]
 	}
 
-	al.data[pos] = e
+	al.data[index] = e
 	al.size++
 
 	return true
 }
 
-func find(al *ArrayList, val int) int {
+func find(al *ArrayList, element int) int {
 
 	if al.IsEmpty() {
 		return -1
 	}
 
 	for i := 0; i < al.size; i++ {
-		if al.data[i] == val {
+		if al.data[i] == element {
 			return i
 		}
 	}
@@ -261,10 +261,13 @@ func shiftLeft(al *ArrayList, index int) {
 	al.size--
 }
 
-func filterArrayList(al *ArrayList, retain bool, elements ...int) List {
+func filterArrayList(al *ArrayList, retain bool, elements ...int) {
+	//Without extra space
 	temp := NewArrayList()
 	a := make(map[int]bool)
-
+	//1,2,1
+	//1
+	//1,1-->
 	for _, e := range elements {
 		a[e] = true
 	}
@@ -282,5 +285,4 @@ func filterArrayList(al *ArrayList, retain bool, elements ...int) List {
 	}
 
 	*al = *temp
-	return al
 }
