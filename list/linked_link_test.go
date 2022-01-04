@@ -1,6 +1,7 @@
 package list
 
 import (
+	"errors"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -423,6 +424,58 @@ func TestLinkedListContainsAll(t *testing.T) {
 		},
 	}
 
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res := testCase.actualResult()
+			assert.Equal(t, testCase.expectedResult, res)
+		})
+	}
+}
+
+func TestLinkedListIndexOf(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() int
+		expectedResult int
+		expectedError  error
+	}{
+		{
+			name: "test indexOf when list is empty",
+			actualResult: func() int {
+				ll := NewLinkedList()
+				return ll.IndexOf(1)
+			},
+			expectedResult: -1,
+			expectedError:  errors.New("invalid operation: list is empty"),
+		},
+		{
+			name: "test indexOf when element at first index",
+			actualResult: func() int {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+				return ll.IndexOf(1)
+			},
+			expectedResult: 0,
+			expectedError:  nil,
+		},
+		{
+			name: "test indexOf when element at last index",
+			actualResult: func() int {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+				return ll.IndexOf(5)
+			},
+			expectedResult: 4,
+			expectedError:  nil,
+		},
+		{
+			name: "test indexOf when element not in list",
+			actualResult: func() int {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+				return ll.IndexOf(6)
+			},
+			expectedResult: -1,
+			expectedError:  errors.New("element 6 not found in the LinkedList"),
+		},
+	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			res := testCase.actualResult()

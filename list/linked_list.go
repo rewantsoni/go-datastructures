@@ -70,14 +70,7 @@ func (ll *LinkedList) GetAt(index int) int {
 }
 
 func (ll *LinkedList) Contains(element int) bool {
-	temp := ll.first
-	for temp != nil {
-		if temp.data == element {
-			return true
-		}
-		temp = temp.next
-	}
-	return false
+	return ll.IndexOf(element) != -1
 }
 
 func (ll *LinkedList) ContainsAll(elements ...int) bool {
@@ -90,8 +83,7 @@ func (ll *LinkedList) ContainsAll(elements ...int) bool {
 }
 
 func (ll *LinkedList) IndexOf(element int) int {
-	//TODO implement me
-	panic("implement me")
+	return ll.find(element)
 }
 
 func (ll *LinkedList) Replace(oldElement int, newElement int) bool {
@@ -192,4 +184,15 @@ func (ll *LinkedList) traverseTo(index int) *node {
 
 	return temp
 
+}
+
+func (ll *LinkedList) find(element int) int {
+	temp := ll.first
+	for i := 0; i < ll.Size(); i++ {
+		if temp.data == element {
+			return i
+		}
+		temp = temp.next
+	}
+	return -1
 }
