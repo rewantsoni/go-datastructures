@@ -110,7 +110,7 @@ func (al *ArrayList) Replace(oldElement int, newElement int) bool {
 	return ok
 }
 
-//Can return a panic
+//TODO: Can return a panic
 func (al *ArrayList) Set(index int, newElement int) bool {
 	if al.IsEmpty() || index < 0 || index >= al.size {
 		return false
@@ -131,7 +131,7 @@ func (al *ArrayList) Remove(element int) bool {
 	return true
 }
 
-//Can return a panic
+//TODO: Can return a panic
 func (al *ArrayList) RemoveAt(index int) (int, bool) {
 	if al.IsEmpty() || index < 0 || index >= al.size {
 		return -1, false

@@ -12,7 +12,7 @@ func TestCreateNewArrayList(t *testing.T) {
 	testCases := []struct {
 		name           string
 		actualResult   func() List
-		expectedResult *ArrayList
+		expectedResult List
 		expectedError  error
 	}{
 		{
@@ -79,7 +79,7 @@ func TestArrayListSize(t *testing.T) {
 		expectedResult int
 	}{
 		{
-			name: "test size on creating an new list",
+			name: "test size on creating an new array list",
 			actualResult: func() int {
 				al := NewArrayList()
 				return al.Size()
@@ -87,7 +87,7 @@ func TestArrayListSize(t *testing.T) {
 			expectedResult: 0,
 		},
 		{
-			name: "test size on creating an new list with elements",
+			name: "test size on creating an new array list with elements",
 			actualResult: func() int {
 				al := NewArrayList(1, 2, 3, 4, 5)
 				return al.Size()
@@ -95,7 +95,7 @@ func TestArrayListSize(t *testing.T) {
 			expectedResult: 5,
 		},
 		{
-			name: "test size on creating an new list with 100 elements",
+			name: "test size on creating an new array list with 100 elements",
 			actualResult: func() int {
 				data := make([]int, 100)
 				for i := 0; i < 100; i++ {
@@ -108,7 +108,7 @@ func TestArrayListSize(t *testing.T) {
 		},
 	}
 
-	//newArrayListBuilder(size = 100, random = true, incremental = true)
+	//TODO: newArrayListBuilder(size = 100, random = true, incremental = true)
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {

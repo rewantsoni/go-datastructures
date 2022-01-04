@@ -15,3 +15,22 @@ type testAdd struct {
 func (a testAdd) Apply(e int) int {
 	return e + a.Val
 }
+
+func testCreateNodes(elements ...int) (*node, *node) {
+	var first, prev, curr *node
+	for _, element := range elements {
+		curr = newNode(element)
+
+		if first == nil {
+			first = curr
+		}
+
+		if prev != nil {
+			curr.prev = prev
+			prev.next = curr
+		}
+
+		prev = curr
+	}
+	return first, curr
+}

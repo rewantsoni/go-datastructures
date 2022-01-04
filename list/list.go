@@ -6,21 +6,21 @@ import (
 )
 
 type List interface {
-	Size() int
-	IsEmpty() bool
 	Add(element int) bool
 	AddAll(elements ...int) bool
 	AddAt(index int, element int) bool
-	GetAt(index int) int
 	Contains(element int) bool
 	ContainsAll(elements ...int) bool
+	GetAt(index int) int
 	IndexOf(element int) int
-	Replace(oldElement int, newElement int) bool
-	Set(index int, newElement int) bool
+	IsEmpty() bool
+	Iterator() iterator.Iterator
 	Remove(element int) bool
 	RemoveAt(index int) (int, bool)
-	RetainAll(elements ...int)
 	RemoveAll(elements ...int)
+	Replace(oldElement int, newElement int) bool
 	ReplaceAll(operator operators.UnaryOperator)
-	Iterator() iterator.Iterator
+	RetainAll(elements ...int)
+	Set(index int, newElement int) bool
+	Size() int
 }

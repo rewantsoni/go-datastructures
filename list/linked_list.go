@@ -9,6 +9,7 @@ import (
 type node struct {
 	data int
 	next *node
+	prev *node
 }
 
 func newNode(element int) *node {
@@ -21,6 +22,7 @@ type LinkedList struct {
 	size int
 
 	first *node
+	last  *node
 }
 
 func NewLinkedList(elements ...int) List {
@@ -60,18 +62,31 @@ func (ll *LinkedList) AddAt(index int, element int) bool {
 }
 
 func (ll *LinkedList) GetAt(index int) int {
-	//TODO implement me
-	panic("implement me")
+	if ll.IsEmpty() || index < 0 || index >= ll.Size() {
+		panic(fmt.Sprintf("panic: index %d is out of bound length is %d", index, ll.Size()))
+	}
+
+	return ll.traverseTo(index).data
 }
 
 func (ll *LinkedList) Contains(element int) bool {
-	//TODO implement me
-	panic("implement me")
+	temp := ll.first
+	for temp != nil {
+		if temp.data == element {
+			return true
+		}
+		temp = temp.next
+	}
+	return false
 }
 
 func (ll *LinkedList) ContainsAll(elements ...int) bool {
-	//TODO implement me
-	panic("implement me")
+	for _, element := range elements {
+		if !ll.Contains(element) {
+			return false
+		}
+	}
+	return true
 }
 
 func (ll *LinkedList) IndexOf(element int) int {
@@ -130,28 +145,39 @@ func (ll *LinkedList) addAll(index int, elements ...int) bool {
 
 func (ll *LinkedList) add(index int, element int) bool {
 
-	if !(index >= 0 && index <= ll.size) {
+	if !(index >= 0 && index <= ll.Size()) {
 		return false
 	}
 
 	newData := newNode(element)
-	fmt.Println(newData)
 	if ll.IsEmpty() {
 		ll.first = newData
+		ll.last = newData
 		ll.size++
 		return true
 	}
 
 	if index == 0 {
 		newData.next = ll.first
+		ll.first.prev = newData
 		ll.first = newData
 		ll.size++
 		return true
 	}
 
+	if index == ll.Size() {
+		newData.prev = ll.last
+		ll.last.next = newData
+		ll.last = newData
+		ll.size++
+		return true
+	}
+
 	curData := ll.traverseTo(index)
-	newData.next = curData.next
-	curData.next = newData
+	newData.next = curData
+	curData.prev.next = newData
+	newData.prev = curData.prev
+	curData.prev = newData
 	ll.size++
 
 	return true
@@ -160,7 +186,7 @@ func (ll *LinkedList) add(index int, element int) bool {
 func (ll *LinkedList) traverseTo(index int) *node {
 	temp := ll.first
 
-	for i := 0; i < index-1; i++ {
+	for i := 0; i < index; i++ {
 		temp = temp.next
 	}
 
