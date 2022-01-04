@@ -87,13 +87,31 @@ func (ll *LinkedList) IndexOf(element int) int {
 }
 
 func (ll *LinkedList) Replace(oldElement int, newElement int) bool {
-	//TODO implement me
-	panic("implement me")
+	if ll.IsEmpty() {
+		return false
+	}
+
+	res := false
+	temp := ll.first
+	for temp != nil {
+		if temp.data == oldElement {
+			temp.data = newElement
+			res = true
+		}
+		temp = temp.next
+	}
+
+	return res
+
 }
 
 func (ll *LinkedList) Set(index int, newElement int) bool {
-	//TODO implement me
-	panic("implement me")
+	if ll.IsEmpty() || index < 0 || index >= ll.Size() {
+		return false
+	}
+
+	ll.traverseTo(index).data = newElement
+	return true
 }
 
 func (ll *LinkedList) Remove(element int) bool {

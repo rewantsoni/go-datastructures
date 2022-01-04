@@ -483,3 +483,126 @@ func TestLinkedListIndexOf(t *testing.T) {
 		})
 	}
 }
+
+func TestLinkedListReplace(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() (List, bool)
+		expectedResult func() List
+		expectedBool   bool
+	}{
+		{
+			name: "test replace when LinkedList is empty",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList()
+				err := ll.Replace(1, 4)
+				return ll, err
+			},
+			expectedResult: func() List {
+				ll := NewLinkedList()
+				return ll
+			},
+			expectedBool: false,
+		},
+		{
+			name: "test replace when LinkedList has elements",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+				res := ll.Replace(1, 4)
+				return ll, res
+			},
+			expectedResult: func() List {
+				return NewLinkedList(4, 2, 3, 4, 5)
+			},
+			expectedBool: true,
+		},
+		{
+			name: "test replace when LinkedList has same element more than once",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList(1, 2, 1, 4, 5)
+				res := ll.Replace(1, 4)
+				return ll, res
+			},
+			expectedResult: func() List {
+				return NewLinkedList(4, 2, 4, 4, 5)
+			},
+			expectedBool: true,
+		},
+		{
+			name: "test replace when LinkedList does not have element",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList(2, 2, 3, 4, 5)
+				res := ll.Replace(1, 4)
+				return ll, res
+			},
+			expectedResult: func() List {
+				return NewLinkedList(2, 2, 3, 4, 5)
+			},
+			expectedBool: false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res, b := testCase.actualResult()
+			assert.Equal(t, testCase.expectedBool, b)
+			assert.Equal(t, testCase.expectedResult(), res)
+		})
+
+	}
+}
+
+func TestLinkedListSet(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() (List, bool)
+		expectedResult func() List
+		expectedBool   bool
+	}{
+		{
+			name: "test Set when LinkedList is empty",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList()
+				res := ll.Set(1, 4)
+				return ll, res
+			},
+			expectedBool: false,
+			expectedResult: func() List {
+				return NewLinkedList()
+			},
+		},
+		{
+			name: "test Set when LinkedList has elements",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+				res := ll.Set(1, 4)
+				return ll, res
+			},
+			expectedBool: true,
+			expectedResult: func() List {
+				return NewLinkedList(1, 4, 3, 4, 5)
+			},
+		},
+		{
+			name: "test Set when index is out of bond",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+				res := ll.Set(10, 4)
+				return ll, res
+			},
+			expectedBool: false,
+			expectedResult: func() List {
+				return NewLinkedList(1, 2, 3, 4, 5)
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res, b := testCase.actualResult()
+			assert.Equal(t, testCase.expectedBool, b)
+			assert.Equal(t, testCase.expectedResult(), res)
+		})
+
+	}
+}
