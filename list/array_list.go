@@ -18,10 +18,10 @@ type ArrayList struct {
 
 type arrayListIterator struct {
 	currentIndex int
-	al           *ArrayList
+	al           List
 }
 
-func NewArrayList(elements ...int) *ArrayList {
+func NewArrayList(elements ...int) List {
 	al := &ArrayList{
 		size:            nought,
 		capacity:        initialCapacity,
@@ -110,6 +110,7 @@ func (al *ArrayList) Replace(oldElement int, newElement int) bool {
 	return ok
 }
 
+//Can return a panic
 func (al *ArrayList) Set(index int, newElement int) bool {
 	if al.IsEmpty() || index < 0 || index >= al.size {
 		return false
@@ -130,6 +131,7 @@ func (al *ArrayList) Remove(element int) bool {
 	return true
 }
 
+//Can return a panic
 func (al *ArrayList) RemoveAt(index int) (int, bool) {
 	if al.IsEmpty() || index < 0 || index >= al.size {
 		return -1, false
@@ -142,11 +144,11 @@ func (al *ArrayList) RemoveAt(index int) (int, bool) {
 }
 
 func (al *ArrayList) RetainAll(elements ...int) {
-	al.filterArrayList(true, NewArrayList(elements...), 0, 0, al.size)
+	al.filterArrayList(true, elements...)
 }
 
 func (al *ArrayList) RemoveAll(elements ...int) {
-	al.filterArrayList(false, NewArrayList(elements...), 0, 0, al.size)
+	al.filterArrayList(false, elements...)
 }
 
 func (al *ArrayList) ReplaceAll(operator operators.UnaryOperator) {
@@ -170,7 +172,7 @@ func (al *ArrayList) String() string {
 }
 
 func (ali *arrayListIterator) HasNext() bool {
-	return ali.currentIndex < ali.al.size
+	return ali.currentIndex < ali.al.Size()
 }
 
 func (ali *arrayListIterator) Next() int {
@@ -247,29 +249,31 @@ func (al *ArrayList) shiftLeft(index int) {
 	al.size--
 }
 
-func (al *ArrayList) filterArrayList(retain bool, elements *ArrayList, i int, j int, size int) {
-	if i == size {
-		return
+//TODO: Improve the logic for filtering the arrayList
+func (al *ArrayList) filterArrayList(retain bool, elements ...int) {
+	cache := map[int]bool{}
+	temp := make([]int, al.capacity)
+	j := 0
+
+	for _, e := range elements {
+		cache[e] = true
 	}
 
-	if elements.Contains(al.data[i]) {
-		if retain {
-			al.data[j] = al.data[i]
-			j++
+	for i := 0; i < al.size; i++ {
+		if cache[al.data[i]] {
+			if retain {
+				temp[j] = al.data[i]
+				j++
+			}
 		} else {
-			al.size--
+			if !retain {
+				temp[j] = al.data[i]
+				j++
+			}
 		}
 	}
-
-	if !elements.Contains(al.data[i]) {
-		if !retain {
-			al.data[j] = al.data[i]
-			j++
-		} else {
-			al.size--
-		}
-	}
-	al.filterArrayList(retain, elements, i+1, j, size)
+	al.data = temp
+	al.size = j
 }
 
 func resize(capacity int, data []int) []int {

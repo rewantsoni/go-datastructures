@@ -11,13 +11,13 @@ import (
 func TestCreateNewArrayList(t *testing.T) {
 	testCases := []struct {
 		name           string
-		actualResult   func() *ArrayList
+		actualResult   func() List
 		expectedResult *ArrayList
 		expectedError  error
 	}{
 		{
 			name: "test create new empty array list",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				return NewArrayList()
 			},
 			expectedResult: &ArrayList{
@@ -31,7 +31,7 @@ func TestCreateNewArrayList(t *testing.T) {
 		},
 		{
 			name: "test create new array list with elements",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				return NewArrayList(1, 2, 3, 4, 5)
 			},
 			expectedResult: &ArrayList{
@@ -45,7 +45,7 @@ func TestCreateNewArrayList(t *testing.T) {
 		},
 		{
 			name: "test create new array list with 1000 elements",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				data := make([]int, 1000)
 				for i := 0; i < 1000; i++ {
 					data[i] = i
@@ -82,7 +82,7 @@ func TestArrayListSize(t *testing.T) {
 			name: "test size on creating an new list",
 			actualResult: func() int {
 				al := NewArrayList()
-				return al.size
+				return al.Size()
 			},
 			expectedResult: 0,
 		},
@@ -90,7 +90,7 @@ func TestArrayListSize(t *testing.T) {
 			name: "test size on creating an new list with elements",
 			actualResult: func() int {
 				al := NewArrayList(1, 2, 3, 4, 5)
-				return al.size
+				return al.Size()
 			},
 			expectedResult: 5,
 		},
@@ -102,7 +102,7 @@ func TestArrayListSize(t *testing.T) {
 					data[i] = i
 				}
 				al := NewArrayList(data...)
-				return al.size
+				return al.Size()
 			},
 			expectedResult: 100,
 		},
@@ -255,69 +255,69 @@ func TestArrayListAddAll(t *testing.T) {
 func TestArrayListAddAt(t *testing.T) {
 	testCases := []struct {
 		name              string
-		actualResult      func() (bool, *ArrayList)
-		expectedArrayList func() *ArrayList
+		actualResult      func() (bool, List)
+		expectedArrayList func() List
 		expectedResult    bool
 	}{
 		{
 			name: "test addAt index 10 when list is empty",
-			actualResult: func() (bool, *ArrayList) {
+			actualResult: func() (bool, List) {
 				al := NewArrayList()
 				res := al.AddAt(10, 1)
 				return res, al
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList()
 			},
 			expectedResult: false,
 		},
 		{
 			name: "test addAt index 0 when list is empty",
-			actualResult: func() (bool, *ArrayList) {
+			actualResult: func() (bool, List) {
 				al := NewArrayList()
 				res := al.AddAt(0, 1)
 				return res, al
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList(1)
 			},
 			expectedResult: true,
 		},
 		{
 			name: "test addAt is first index when list is not empty",
-			actualResult: func() (bool, *ArrayList) {
+			actualResult: func() (bool, List) {
 				al := NewArrayList(1, 2, 3)
 
 				res := al.AddAt(0, 10)
 				return res, al
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList(10, 1, 2, 3)
 			},
 			expectedResult: true,
 		},
 		{
 			name: "test addAt is last index when list is not empty",
-			actualResult: func() (bool, *ArrayList) {
+			actualResult: func() (bool, List) {
 				al := NewArrayList(1, 2, 3)
 
 				res := al.AddAt(3, 10)
 				return res, al
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList(1, 2, 3, 10)
 			},
 			expectedResult: true,
 		},
 		{
 			name: "test addAt is last index+1 when list is not empty",
-			actualResult: func() (bool, *ArrayList) {
+			actualResult: func() (bool, List) {
 				al := NewArrayList(1, 2, 3)
 
 				res := al.AddAt(4, 10)
 				return res, al
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList(1, 2, 3)
 			},
 			expectedResult: false,
@@ -544,18 +544,18 @@ func TestArrayListIndexOf(t *testing.T) {
 func TestArrayListReplace(t *testing.T) {
 	testCases := []struct {
 		name           string
-		actualResult   func() (*ArrayList, bool)
-		expectedResult func() *ArrayList
+		actualResult   func() (List, bool)
+		expectedResult func() List
 		expectedBool   bool
 	}{
 		{
 			name: "test replace when arrayList is empty",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList()
 				err := al.Replace(1, 4)
 				return al, err
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				al := NewArrayList()
 				return al
 			},
@@ -563,36 +563,36 @@ func TestArrayListReplace(t *testing.T) {
 		},
 		{
 			name: "test replace when arrayList has elements",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList(1, 2, 3, 4, 5)
 				res := al.Replace(1, 4)
 				return al, res
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList(4, 2, 3, 4, 5)
 			},
 			expectedBool: true,
 		},
 		{
 			name: "test replace when arrayList has same element twice",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList(1, 2, 1, 4, 5)
 				res := al.Replace(1, 4)
 				return al, res
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList(4, 2, 4, 4, 5)
 			},
 			expectedBool: true,
 		},
 		{
 			name: "test replace when arrayList does not have element",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList(2, 2, 3, 4, 5)
 				res := al.Replace(1, 4)
 				return al, res
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList(2, 2, 3, 4, 5)
 			},
 			expectedBool: false,
@@ -612,43 +612,43 @@ func TestArrayListReplace(t *testing.T) {
 func TestArrayListSet(t *testing.T) {
 	testCases := []struct {
 		name           string
-		actualResult   func() (*ArrayList, bool)
-		expectedResult func() *ArrayList
+		actualResult   func() (List, bool)
+		expectedResult func() List
 		expectedBool   bool
 	}{
 		{
 			name: "test Set when arrayList is empty",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList()
 				res := al.Set(1, 4)
 				return al, res
 			},
 			expectedBool: false,
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList()
 			},
 		},
 		{
 			name: "test Set when arrayList has elements",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList(1, 2, 3, 4, 5)
 				res := al.Set(1, 4)
 				return al, res
 			},
 			expectedBool: true,
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList(1, 4, 3, 4, 5)
 			},
 		},
 		{
 			name: "test Set when index is out of bond",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList(1, 2, 3, 4, 5)
 				res := al.Set(10, 4)
 				return al, res
 			},
 			expectedBool: false,
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList(1, 2, 3, 4, 5)
 			},
 		},
@@ -667,32 +667,32 @@ func TestArrayListSet(t *testing.T) {
 func TestArrayListRemove(t *testing.T) {
 	testCases := []struct {
 		name              string
-		actualResult      func() (*ArrayList, bool)
+		actualResult      func() (List, bool)
 		expectedResult    bool
-		expectedArrayList func() *ArrayList
+		expectedArrayList func() List
 	}{
 		{
 			name: "test remove element when list is empty",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList()
 
 				res := al.Remove(1)
 				return al, res
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList()
 			},
 			expectedResult: false,
 		},
 		{
 			name: "test remove first occurrence of element",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList(1, 2, 3, 1, 5)
 
 				res := al.Remove(1)
 				return al, res
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				al := NewArrayList(2, 3, 1, 5)
 				return al
 			},
@@ -700,12 +700,12 @@ func TestArrayListRemove(t *testing.T) {
 		},
 		{
 			name: "test remove element when element not present",
-			actualResult: func() (*ArrayList, bool) {
+			actualResult: func() (List, bool) {
 				al := NewArrayList(1, 2, 3, 4, 5)
 				res := al.Remove(6)
 				return al, res
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList(1, 2, 3, 4, 5)
 			},
 			expectedResult: false,
@@ -723,20 +723,20 @@ func TestArrayListRemove(t *testing.T) {
 func TestArrayListRemoveAt(t *testing.T) {
 	testCases := []struct {
 		name              string
-		actualResult      func() (*ArrayList, int, bool)
+		actualResult      func() (List, int, bool)
 		expectedResult    int
-		expectedArrayList func() *ArrayList
+		expectedArrayList func() List
 		expectedBool      bool
 	}{
 		{
 			name: "test removeAt element when list is empty",
-			actualResult: func() (*ArrayList, int, bool) {
+			actualResult: func() (List, int, bool) {
 				al := NewArrayList()
 
 				res, err := al.RemoveAt(1)
 				return al, res, err
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList()
 			},
 			expectedBool:   false,
@@ -744,13 +744,13 @@ func TestArrayListRemoveAt(t *testing.T) {
 		},
 		{
 			name: "test removeAt index when list has elements",
-			actualResult: func() (*ArrayList, int, bool) {
+			actualResult: func() (List, int, bool) {
 				al := NewArrayList(1, 2, 3, 1, 5)
 
 				res, err := al.RemoveAt(1)
 				return al, res, err
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList(1, 3, 1, 5)
 			},
 			expectedBool:   true,
@@ -758,13 +758,13 @@ func TestArrayListRemoveAt(t *testing.T) {
 		},
 		{
 			name: "test removeAt element when index not present",
-			actualResult: func() (*ArrayList, int, bool) {
+			actualResult: func() (List, int, bool) {
 				al := NewArrayList(1, 2, 3, 4, 5)
 
 				res, err := al.RemoveAt(6)
 				return al, res, err
 			},
-			expectedArrayList: func() *ArrayList {
+			expectedArrayList: func() List {
 				return NewArrayList(1, 2, 3, 4, 5)
 			},
 			expectedBool:   false,
@@ -785,28 +785,28 @@ func TestArrayListRemoveAt(t *testing.T) {
 func TestArrayListRetainAll(t *testing.T) {
 	testCases := []struct {
 		name           string
-		actualResult   func() *ArrayList
-		expectedResult func() *ArrayList
+		actualResult   func() List
+		expectedResult func() List
 	}{
 		{
 			name: "test when arrayList is empty",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				al := NewArrayList()
 				al.RetainAll(1, 2, 3)
 				return al
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList()
 			},
 		},
 		{
 			name: "test when arrayList is not empty",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				al := NewArrayList(1, 2, 3, 4, 5, 1)
 				al.RetainAll(1, 2, 3)
 				return al
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList(1, 2, 3, 1)
 			},
 		},
@@ -815,10 +815,10 @@ func TestArrayListRetainAll(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			res := testCase.actualResult()
 			ExpectedRes := testCase.actualResult()
-			for i := 0; i < res.size; i++ {
-				assert.Equal(t, ExpectedRes.data[i], res.data[i])
+			for i := 0; i < res.Size(); i++ {
+				assert.Equal(t, ExpectedRes.GetAt(i), res.GetAt(i))
 			}
-			assert.Equal(t, ExpectedRes.size, res.size)
+			assert.Equal(t, ExpectedRes.Size(), res.Size())
 		})
 	}
 }
@@ -826,28 +826,28 @@ func TestArrayListRetainAll(t *testing.T) {
 func TestArrayListRemoveAll(t *testing.T) {
 	testCases := []struct {
 		name           string
-		actualResult   func() *ArrayList
-		expectedResult func() *ArrayList
+		actualResult   func() List
+		expectedResult func() List
 	}{
 		{
 			name: "test when arrayList is empty",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				al := NewArrayList()
 				al.RemoveAll(1, 2, 3)
 				return al
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList()
 			},
 		},
 		{
 			name: "test when arrayList is not empty",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				al := NewArrayList(1, 2, 3, 4, 5, 1)
 				al.RemoveAll(1, 2, 3)
 				return al
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList(4, 5)
 			},
 		},
@@ -856,10 +856,10 @@ func TestArrayListRemoveAll(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			res := testCase.actualResult()
 			ExpectedRes := testCase.actualResult()
-			for i := 0; i < res.size; i++ {
-				assert.Equal(t, ExpectedRes.data[i], res.data[i])
+			for i := 0; i < res.Size(); i++ {
+				assert.Equal(t, ExpectedRes.GetAt(i), res.GetAt(i))
 			}
-			assert.Equal(t, ExpectedRes.size, res.size)
+			assert.Equal(t, ExpectedRes.Size(), res.Size())
 		})
 	}
 }
@@ -868,39 +868,39 @@ func TestArrayListReplaceAll(t *testing.T) {
 
 	testCases := []struct {
 		name           string
-		actualResult   func() *ArrayList
-		expectedResult func() *ArrayList
+		actualResult   func() List
+		expectedResult func() List
 	}{
 		{
 			name: "test replace all when array is empty",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				al := NewArrayList()
 				al.ReplaceAll(testMultiply{Val: 2})
 				return al
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList()
 			},
 		},
 		{
 			name: "test replace all when function multiply and array not empty",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				al := NewArrayList(1, 2, 3)
 				al.ReplaceAll(testMultiply{Val: 2})
 				return al
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList(2, 4, 6)
 			},
 		},
 		{
 			name: "test replace all when add function and array not empty",
-			actualResult: func() *ArrayList {
+			actualResult: func() List {
 				al := NewArrayList(1, 2, 3)
 				al.ReplaceAll(testAdd{Val: 10})
 				return al
 			},
-			expectedResult: func() *ArrayList {
+			expectedResult: func() List {
 				return NewArrayList(11, 12, 13)
 			},
 		},

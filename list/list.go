@@ -11,8 +11,9 @@ type List interface {
 	Add(element int) bool
 	AddAll(elements ...int) bool
 	AddAt(index int, element int) bool
-	GetAt(i int) int
+	GetAt(index int) int
 	Contains(element int) bool
+	ContainsAll(elements ...int) bool
 	IndexOf(element int) int
 	Replace(oldElement int, newElement int) bool
 	Set(index int, newElement int) bool
