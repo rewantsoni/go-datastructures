@@ -54,7 +54,7 @@ func (al *ArrayList) Size() int {
 }
 
 func (al *ArrayList) IsEmpty() bool {
-	return al.size == 0
+	return al.Size() == 0
 }
 
 func (al *ArrayList) Add(element int) bool {
@@ -196,9 +196,9 @@ func (al *ArrayList) checkAndDecreaseLimit() {
 	}
 }
 
-func (al *ArrayList) addAll(index int, data ...int) bool {
+func (al *ArrayList) addAll(index int, elements ...int) bool {
 
-	for i, d := range data {
+	for i, d := range elements {
 		if !al.add(index+i, d) {
 			return false
 		}
@@ -206,7 +206,7 @@ func (al *ArrayList) addAll(index int, data ...int) bool {
 	return true
 }
 
-func (al *ArrayList) add(index int, e int) bool {
+func (al *ArrayList) add(index int, element int) bool {
 
 	if !(index >= 0 && index <= al.size) {
 		return false
@@ -218,7 +218,7 @@ func (al *ArrayList) add(index int, e int) bool {
 		al.data[i] = al.data[i-1]
 	}
 
-	al.data[index] = e
+	al.data[index] = element
 	al.size++
 
 	return true
