@@ -23,4 +23,8 @@ type List interface {
 	RetainAll(elements ...int)
 	Set(index int, newElement int) bool
 	Size() int
+	//Clear()
+	//Clone()
+	//LastIndexOf()
+	//SubList()
 }

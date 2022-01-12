@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/rewantsoni/go-datastructures/iterator"
 	"github.com/rewantsoni/go-datastructures/operators"
+	"strings"
 )
 
 type node struct {
@@ -115,13 +116,68 @@ func (ll *LinkedList) Set(index int, newElement int) bool {
 }
 
 func (ll *LinkedList) Remove(element int) bool {
-	//TODO implement me
-	panic("implement me")
+
+	if ll.IsEmpty() {
+		return false
+	}
+
+	if ll.first.data == element {
+		ll.first = ll.first.next
+		ll.first.prev = nil
+		ll.size--
+		return true
+	}
+
+	if ll.last.data == element {
+		ll.last = ll.last.prev
+		ll.last.next = nil
+		ll.size--
+		return true
+	}
+
+	cur := ll.first
+	for cur != nil {
+		if cur.data == element {
+			cur.prev.next = cur.next
+			cur.next.prev = cur.prev
+			ll.size--
+			return true
+		}
+		cur = cur.next
+	}
+	return false
 }
 
 func (ll *LinkedList) RemoveAt(index int) (int, bool) {
-	//TODO implement me
-	panic("implement me")
+	if ll.IsEmpty() || index < 0 || index >= ll.size {
+		return -1, false
+	}
+
+	if index == 0 {
+		temp := ll.first.data
+		ll.first = ll.first.next
+		ll.first.prev = nil
+		ll.size--
+		return temp, true
+	}
+
+	if index == ll.size-1 {
+		temp := ll.last.data
+		ll.last = ll.last.prev
+		ll.last.next = nil
+		ll.size--
+		return temp, true
+	}
+
+	cur := ll.first
+	for i := 0; i < index; i++ {
+		cur = cur.next
+	}
+	temp := cur.data
+	cur.prev.next = cur.next
+	cur.next.prev = cur.prev
+	ll.size--
+	return temp, true
 }
 
 func (ll *LinkedList) RetainAll(elements ...int) {
@@ -142,6 +198,17 @@ func (ll *LinkedList) ReplaceAll(operator operators.UnaryOperator) {
 func (ll *LinkedList) Iterator() iterator.Iterator {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (ll *LinkedList) String() string {
+	sb := strings.Builder{}
+	temp := ll.first
+	for temp != nil {
+		sb.WriteString(fmt.Sprintf("%d ", temp.data))
+		temp = temp.next
+	}
+
+	return sb.String()
 }
 
 func (ll *LinkedList) addAll(index int, elements ...int) bool {

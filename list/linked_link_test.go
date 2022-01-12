@@ -606,3 +606,177 @@ func TestLinkedListSet(t *testing.T) {
 
 	}
 }
+
+func TestLinkedListRemove(t *testing.T) {
+	testCases := []struct {
+		name               string
+		actualResult       func() (List, bool)
+		expectedResult     bool
+		expectedLinkedList func() List
+	}{
+		{
+			name: "test remove element when list is empty",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList()
+
+				res := ll.Remove(1)
+				return ll, res
+			},
+			expectedLinkedList: func() List {
+				return NewLinkedList()
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test remove first occurrence of element",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList(1, 2, 3, 1, 5)
+
+				res := ll.Remove(1)
+				return ll, res
+			},
+			expectedLinkedList: func() List {
+				ll := NewLinkedList(2, 3, 1, 5)
+				return ll
+			},
+			expectedResult: true,
+		},
+		{
+			name: "test remove when occurrence of element in middle",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList(4, 2, 3, 1, 5)
+
+				res := ll.Remove(1)
+				return ll, res
+			},
+			expectedLinkedList: func() List {
+				ll := NewLinkedList(4, 2, 3, 5)
+				return ll
+			},
+			expectedResult: true,
+		},
+		{
+			name: "test remove when occurrence of element at end",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList(4, 2, 3, 1, 5)
+
+				res := ll.Remove(5)
+				return ll, res
+			},
+			expectedLinkedList: func() List {
+				ll := NewLinkedList(4, 2, 3, 1)
+				return ll
+			},
+			expectedResult: true,
+		},
+		{
+			name: "test remove element when element not present",
+			actualResult: func() (List, bool) {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+				res := ll.Remove(6)
+				return ll, res
+			},
+			expectedLinkedList: func() List {
+				return NewLinkedList(1, 2, 3, 4, 5)
+			},
+			expectedResult: false,
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			ll, res := testCase.actualResult()
+			assert.Equal(t, testCase.expectedLinkedList(), ll)
+			assert.Equal(t, testCase.expectedResult, res)
+		})
+	}
+}
+
+func TestLinkedListRemoveAt(t *testing.T) {
+	testCases := []struct {
+		name               string
+		actualResult       func() (List, int, bool)
+		expectedResult     int
+		expectedLinkedList func() List
+		expectedBool       bool
+	}{
+		{
+			name: "test removeAt element when list is empty",
+			actualResult: func() (List, int, bool) {
+				ll := NewLinkedList()
+
+				res, err := ll.RemoveAt(1)
+				return ll, res, err
+			},
+			expectedLinkedList: func() List {
+				return NewLinkedList()
+			},
+			expectedBool:   false,
+			expectedResult: -1,
+		},
+		{
+			name: "test removeAt index when list has elements",
+			actualResult: func() (List, int, bool) {
+				ll := NewLinkedList(1, 2, 3, 1, 5)
+
+				res, err := ll.RemoveAt(1)
+				return ll, res, err
+			},
+			expectedLinkedList: func() List {
+				return NewLinkedList(1, 3, 1, 5)
+			},
+			expectedBool:   true,
+			expectedResult: 2,
+		},
+		{
+			name: "test removeAt index when list has elements at first",
+			actualResult: func() (List, int, bool) {
+				ll := NewLinkedList(1, 2, 3, 1, 5)
+
+				res, err := ll.RemoveAt(0)
+				return ll, res, err
+			},
+			expectedLinkedList: func() List {
+				return NewLinkedList(2, 3, 1, 5)
+			},
+			expectedBool:   true,
+			expectedResult: 1,
+		},
+		{
+			name: "test removeAt index when list has elements at last",
+			actualResult: func() (List, int, bool) {
+				ll := NewLinkedList(1, 2, 3, 1, 5)
+
+				res, err := ll.RemoveAt(4)
+				return ll, res, err
+			},
+			expectedLinkedList: func() List {
+				return NewLinkedList(1, 2, 3, 1)
+			},
+			expectedBool:   true,
+			expectedResult: 5,
+		},
+		{
+			name: "test removeAt element when index not present",
+			actualResult: func() (List, int, bool) {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+
+				res, err := ll.RemoveAt(6)
+				return ll, res, err
+			},
+			expectedLinkedList: func() List {
+				return NewLinkedList(1, 2, 3, 4, 5)
+			},
+			expectedBool:   false,
+			expectedResult: -1,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			ll, res, b := testCase.actualResult()
+			assert.Equal(t, testCase.expectedBool, b)
+			assert.Equal(t, testCase.expectedLinkedList(), ll)
+			assert.Equal(t, testCase.expectedResult, res)
+		})
+	}
+}
