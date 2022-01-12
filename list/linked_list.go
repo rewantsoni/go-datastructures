@@ -209,6 +209,26 @@ func (ll *LinkedList) Size() int {
 	return ll.size
 }
 
+func (ll *LinkedList) SubList(start, end int) (bool, List) {
+
+	if (start >= end) || (start < 0 || start >= ll.Size()) || (end < 0 || end > ll.Size()) {
+		return false, nil
+	}
+
+	tempList := NewLinkedList()
+
+	cur := ll.first
+
+	for i := 0; i < ll.Size(); i++ {
+		if i >= start && i < end {
+			tempList.Add(cur.data)
+		}
+		cur = cur.next
+	}
+
+	return true, tempList
+}
+
 func (ll *LinkedList) String() string {
 	sb := strings.Builder{}
 	temp := ll.first

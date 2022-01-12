@@ -10,6 +10,7 @@ type List interface {
 	AddAll(elements ...int) bool
 	AddAt(index int, element int) bool
 	Clear()
+	//Clone() List
 	Contains(element int) bool
 	ContainsAll(elements ...int) bool
 	GetAt(index int) int
@@ -24,7 +25,7 @@ type List interface {
 	RetainAll(elements ...int)
 	Set(index int, newElement int) bool
 	Size() int
-	//Clone()
+	SubList(start, end int) (bool, List)
 	//LastIndexOf()
 	//SubList()
 }

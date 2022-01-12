@@ -1125,3 +1125,94 @@ func TestArrayListIteratorNext(t *testing.T) {
 		})
 	}
 }
+
+func TestArrayListSubList(t *testing.T) {
+	testCases := []struct {
+		name              string
+		actualResult      func() (bool, List)
+		expectedArrayList func() List
+		expectedResult    bool
+	}{
+		{
+			name: "test sublist when start index is more than end index",
+			actualResult: func() (bool, List) {
+				al := NewArrayList()
+				res, tempList := al.SubList(12, 10)
+				return res, tempList
+			},
+			expectedArrayList: func() List {
+				return nil
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test sublist when list is empty and start is out of bound",
+			actualResult: func() (bool, List) {
+				al := NewArrayList()
+				res, tempList := al.SubList(2, 7)
+				return res, tempList
+			},
+			expectedArrayList: func() List {
+				return nil
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test sublist when list is empty and not in bound",
+			actualResult: func() (bool, List) {
+				al := NewArrayList(1, 2)
+				res, tempList := al.SubList(2, 2)
+				return res, tempList
+			},
+			expectedArrayList: func() List {
+				return nil
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test sublist when list end is out of bound",
+			actualResult: func() (bool, List) {
+				al := NewArrayList(1, 2, 3)
+				res, tempList := al.SubList(2, 4)
+				return res, tempList
+			},
+			expectedArrayList: func() List {
+				return nil
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test sublist when list is not empty",
+			actualResult: func() (bool, List) {
+				al := NewArrayList(1, 2, 3, 4)
+				res, tempList := al.SubList(0, 2)
+				return res, tempList
+			},
+			expectedArrayList: func() List {
+				return NewArrayList(1, 2)
+			},
+			expectedResult: true,
+		},
+		{
+			name: "test sublist when list is not empty",
+			actualResult: func() (bool, List) {
+				al := NewArrayList(1, 2, 3, 4)
+				res, tempList := al.SubList(0, 4)
+				return res, tempList
+			},
+			expectedArrayList: func() List {
+				return NewArrayList(1, 2, 3, 4)
+			},
+			expectedResult: true,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res, resArrayList := testCase.actualResult()
+
+			assert.Equal(t, testCase.expectedResult, res)
+			assert.Equal(t, testCase.expectedArrayList(), resArrayList)
+		})
+	}
+}

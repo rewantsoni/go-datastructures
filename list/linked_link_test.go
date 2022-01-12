@@ -878,3 +878,99 @@ func TestLinkedListReplaceAll(t *testing.T) {
 		})
 	}
 }
+
+func TestLinkedListSubList(t *testing.T) {
+	testCases := []struct {
+		name               string
+		actualResult       func() (bool, List)
+		expectedLinkedList func() List
+		expectedResult     bool
+	}{
+		{
+			name: "test sublist when start index is more than end index",
+			actualResult: func() (bool, List) {
+				ll := NewLinkedList()
+				res, tempList := ll.SubList(12, 10)
+				return res, tempList
+			},
+			expectedLinkedList: func() List {
+				return nil
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test sublist when list is empty and start is out of bound",
+			actualResult: func() (bool, List) {
+				ll := NewLinkedList()
+				res, tempList := ll.SubList(2, 7)
+				return res, tempList
+			},
+			expectedLinkedList: func() List {
+				return nil
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test sublist when list is empty and not in bound",
+			actualResult: func() (bool, List) {
+				ll := NewLinkedList(1, 2)
+				res, tempList := ll.SubList(2, 2)
+				return res, tempList
+			},
+			expectedLinkedList: func() List {
+				return nil
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test sublist when list end is out of bound",
+			actualResult: func() (bool, List) {
+				ll := NewLinkedList(1, 2, 3)
+				res, tempList := ll.SubList(2, 4)
+				return res, tempList
+			},
+			expectedLinkedList: func() List {
+				return nil
+			},
+			expectedResult: false,
+		},
+		{
+			name: "test sublist when list is not empty",
+			actualResult: func() (bool, List) {
+				ll := NewLinkedList(1, 2, 3, 4)
+				res, tempList := ll.SubList(0, 2)
+				return res, tempList
+			},
+			expectedLinkedList: func() List {
+				return NewLinkedList(1, 2)
+			},
+			expectedResult: true,
+		},
+		{
+			name: "test sublist when list is not empty and complete list",
+			actualResult: func() (bool, List) {
+				ll := NewLinkedList(1, 2, 3, 4)
+				res, tempList := ll.SubList(0, 4)
+				return res, tempList
+			},
+			expectedLinkedList: func() List {
+				return NewLinkedList(1, 2, 3, 4)
+			},
+			expectedResult: true,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res, resLinkedList := testCase.actualResult()
+			assert.Equal(t, testCase.expectedResult, res)
+			expectedLinkedList := testCase.expectedLinkedList()
+			if res == true {
+				for i := 0; i < expectedLinkedList.Size(); i++ {
+					assert.Equal(t, expectedLinkedList.GetAt(i), resLinkedList.GetAt(i))
+				}
+			}
+			//assert.Equal(t, testCase.expectedLinkedList(), resLinkedList)
+		})
+	}
+}

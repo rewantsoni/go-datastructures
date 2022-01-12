@@ -50,11 +50,11 @@ func newArrayListIterator(al *ArrayList) *arrayListIterator {
 }
 
 func (al *ArrayList) Add(element int) bool {
-	return al.addAll(al.size, element)
+	return al.addAll(al.Size(), element)
 }
 
 func (al *ArrayList) AddAll(elements ...int) bool {
-	return al.addAll(al.size, elements...)
+	return al.addAll(al.Size(), elements...)
 }
 
 func (al *ArrayList) AddAt(index int, element int) bool {
@@ -67,6 +67,7 @@ func (al *ArrayList) Clear() {
 	}
 	al.size = nought
 }
+
 func (al *ArrayList) Contains(element int) bool {
 	return al.IndexOf(element) != -1
 }
@@ -81,8 +82,8 @@ func (al *ArrayList) ContainsAll(elements ...int) bool {
 }
 
 func (al *ArrayList) GetAt(index int) int {
-	if al.IsEmpty() || index < 0 || index >= al.size {
-		panic(fmt.Sprintf("panic: index %d is out of bound length is %d", index, al.size))
+	if al.IsEmpty() || index < 0 || index >= al.Size() {
+		panic(fmt.Sprintf("panic: index %d is out of bound length is %d", index, al.Size()))
 	}
 
 	return al.data[index]
@@ -113,7 +114,7 @@ func (al *ArrayList) Remove(element int) bool {
 
 //TODO: Can return a panic
 func (al *ArrayList) RemoveAt(index int) (int, bool) {
-	if al.IsEmpty() || index < 0 || index >= al.size {
+	if al.IsEmpty() || index < 0 || index >= al.Size() {
 		return -1, false
 	}
 
@@ -133,7 +134,7 @@ func (al *ArrayList) Replace(oldElement int, newElement int) bool {
 	}
 
 	ok := false
-	for i := 0; i < al.size; i++ {
+	for i := 0; i < al.Size(); i++ {
 		if al.data[i] == oldElement {
 			al.data[i] = newElement
 			ok = true
@@ -144,7 +145,7 @@ func (al *ArrayList) Replace(oldElement int, newElement int) bool {
 }
 
 func (al *ArrayList) ReplaceAll(operator operators.UnaryOperator) {
-	for i := 0; i < al.size; i++ {
+	for i := 0; i < al.Size(); i++ {
 		al.data[i] = operator.Apply(al.data[i])
 	}
 }
@@ -155,7 +156,7 @@ func (al *ArrayList) RetainAll(elements ...int) {
 
 //TODO: Can return a panic
 func (al *ArrayList) Set(index int, newElement int) bool {
-	if al.IsEmpty() || index < 0 || index >= al.size {
+	if al.IsEmpty() || index < 0 || index >= al.Size() {
 		return false
 	}
 
@@ -167,10 +168,26 @@ func (al *ArrayList) Size() int {
 	return al.size
 }
 
+func (al *ArrayList) SubList(start, end int) (bool, List) {
+
+	if (start >= end) || (start < 0 || start >= al.Size()) || (end < 0 || end > al.Size()) {
+		return false, nil
+	}
+
+	tempList := NewArrayList()
+	for i := start; i < end; i++ {
+		if !tempList.Add(al.GetAt(i)) {
+			return false, nil
+		}
+	}
+
+	return true, tempList
+}
+
 func (al *ArrayList) String() string {
 	sb := strings.Builder{}
 
-	for i := 0; i < al.size; i++ {
+	for i := 0; i < al.Size(); i++ {
 		sb.WriteString(fmt.Sprintf("%d ", al.data[i]))
 	}
 
@@ -189,14 +206,14 @@ func (ali *arrayListIterator) Next() int {
 }
 
 func (al *ArrayList) checkAndIncreaseLimit() {
-	if al.size >= int(float64(al.capacity)*al.upperLoadFactor) {
+	if al.Size() >= int(float64(al.capacity)*al.upperLoadFactor) {
 		al.capacity *= al.scalingFactor
 		al.data = resize(al.capacity, al.data)
 	}
 }
 
 func (al *ArrayList) checkAndDecreaseLimit() {
-	if al.size <= int(float64(al.capacity)*al.lowerLoadFactor) && al.capacity != initialCapacity {
+	if al.Size() <= int(float64(al.capacity)*al.lowerLoadFactor) && al.capacity != initialCapacity {
 		al.capacity /= al.scalingFactor
 		al.data = resize(al.capacity, al.data)
 	}
@@ -214,13 +231,13 @@ func (al *ArrayList) addAll(index int, elements ...int) bool {
 
 func (al *ArrayList) add(index int, element int) bool {
 
-	if !(index >= 0 && index <= al.size) {
+	if !(index >= 0 && index <= al.Size()) {
 		return false
 	}
 
 	al.checkAndIncreaseLimit()
 
-	for i := al.size; i > index; i-- {
+	for i := al.Size(); i > index; i-- {
 		al.data[i] = al.data[i-1]
 	}
 
@@ -236,7 +253,7 @@ func (al *ArrayList) find(element int) int {
 		return -1
 	}
 
-	for i := 0; i < al.size; i++ {
+	for i := 0; i < al.Size(); i++ {
 		if al.data[i] == element {
 			return i
 		}
@@ -248,7 +265,7 @@ func (al *ArrayList) shiftLeft(index int) {
 
 	al.checkAndDecreaseLimit()
 
-	for i := index; i < al.size; i++ {
+	for i := index; i < al.Size(); i++ {
 		al.data[i] = al.data[i+1]
 	}
 
@@ -265,7 +282,7 @@ func (al *ArrayList) filterArrayList(retain bool, elements ...int) {
 		cache[e] = true
 	}
 
-	for i := 0; i < al.size; i++ {
+	for i := 0; i < al.Size(); i++ {
 		if cache[al.data[i]] {
 			if retain {
 				temp[j] = al.data[i]
