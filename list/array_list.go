@@ -49,14 +49,6 @@ func newArrayListIterator(al *ArrayList) *arrayListIterator {
 	}
 }
 
-func (al *ArrayList) Size() int {
-	return al.size
-}
-
-func (al *ArrayList) IsEmpty() bool {
-	return al.Size() == 0
-}
-
 func (al *ArrayList) Add(element int) bool {
 	return al.addAll(al.size, element)
 }
@@ -69,14 +61,12 @@ func (al *ArrayList) AddAt(index int, element int) bool {
 	return al.addAll(index, element)
 }
 
-func (al *ArrayList) GetAt(index int) int {
-	if al.IsEmpty() || index < 0 || index >= al.size {
-		panic(fmt.Sprintf("panic: index %d is out of bound length is %d", index, al.size))
+func (al *ArrayList) Clear() {
+	for i := 0; i < al.Size(); i++ {
+		al.data[i] = 0
 	}
-
-	return al.data[index]
+	al.size = nought
 }
-
 func (al *ArrayList) Contains(element int) bool {
 	return al.IndexOf(element) != -1
 }
@@ -90,34 +80,24 @@ func (al *ArrayList) ContainsAll(elements ...int) bool {
 	return true
 }
 
+func (al *ArrayList) GetAt(index int) int {
+	if al.IsEmpty() || index < 0 || index >= al.size {
+		panic(fmt.Sprintf("panic: index %d is out of bound length is %d", index, al.size))
+	}
+
+	return al.data[index]
+}
+
 func (al *ArrayList) IndexOf(element int) int {
 	return al.find(element)
 }
 
-func (al *ArrayList) Replace(oldElement int, newElement int) bool {
-	if al.IsEmpty() {
-		return false
-	}
-
-	ok := false
-	for i := 0; i < al.size; i++ {
-		if al.data[i] == oldElement {
-			al.data[i] = newElement
-			ok = true
-		}
-	}
-
-	return ok
+func (al *ArrayList) IsEmpty() bool {
+	return al.Size() == 0
 }
 
-//TODO: Can return a panic
-func (al *ArrayList) Set(index int, newElement int) bool {
-	if al.IsEmpty() || index < 0 || index >= al.size {
-		return false
-	}
-
-	al.data[index] = newElement
-	return true
+func (al *ArrayList) Iterator() iterator.Iterator {
+	return newArrayListIterator(al)
 }
 
 func (al *ArrayList) Remove(element int) bool {
@@ -143,12 +123,24 @@ func (al *ArrayList) RemoveAt(index int) (int, bool) {
 	return e, true
 }
 
-func (al *ArrayList) RetainAll(elements ...int) {
-	al.filterArrayList(true, elements...)
-}
-
 func (al *ArrayList) RemoveAll(elements ...int) {
 	al.filterArrayList(false, elements...)
+}
+
+func (al *ArrayList) Replace(oldElement int, newElement int) bool {
+	if al.IsEmpty() {
+		return false
+	}
+
+	ok := false
+	for i := 0; i < al.size; i++ {
+		if al.data[i] == oldElement {
+			al.data[i] = newElement
+			ok = true
+		}
+	}
+
+	return ok
 }
 
 func (al *ArrayList) ReplaceAll(operator operators.UnaryOperator) {
@@ -157,8 +149,22 @@ func (al *ArrayList) ReplaceAll(operator operators.UnaryOperator) {
 	}
 }
 
-func (al *ArrayList) Iterator() iterator.Iterator {
-	return newArrayListIterator(al)
+func (al *ArrayList) RetainAll(elements ...int) {
+	al.filterArrayList(true, elements...)
+}
+
+//TODO: Can return a panic
+func (al *ArrayList) Set(index int, newElement int) bool {
+	if al.IsEmpty() || index < 0 || index >= al.size {
+		return false
+	}
+
+	al.data[index] = newElement
+	return true
+}
+
+func (al *ArrayList) Size() int {
+	return al.size
 }
 
 func (al *ArrayList) String() string {

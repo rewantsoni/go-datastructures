@@ -54,6 +54,12 @@ func (ll *LinkedList) AddAt(index int, element int) bool {
 	return ll.addAll(index, element)
 }
 
+func (ll *LinkedList) Clear() {
+	ll.first = nil
+	ll.last = nil
+	ll.size = 0
+}
+
 func (ll *LinkedList) Contains(element int) bool {
 	return ll.IndexOf(element) != -1
 }

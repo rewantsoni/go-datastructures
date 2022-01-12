@@ -119,6 +119,54 @@ func TestArrayListSize(t *testing.T) {
 	}
 }
 
+func TestArrayListClear(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() int
+		expectedResult int
+	}{
+		{
+			name: "test clear on creating an new array list",
+			actualResult: func() int {
+				al := NewArrayList()
+				al.Clear()
+				return al.Size()
+			},
+			expectedResult: 0,
+		},
+		{
+			name: "test clear on creating an new array list with elements",
+			actualResult: func() int {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				al.Clear()
+				return al.Size()
+			},
+			expectedResult: 0,
+		},
+		{
+			name: "test clear on creating an new array list with 100 elements",
+			actualResult: func() int {
+				data := make([]int, 100)
+				for i := 0; i < 100; i++ {
+					data[i] = i
+				}
+				al := NewArrayList(data...)
+				al.Clear()
+				return al.Size()
+			},
+			expectedResult: 0,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			size := testCase.actualResult()
+
+			assert.Equal(t, testCase.expectedResult, size)
+		})
+	}
+}
+
 func TestArrayListAdd(t *testing.T) {
 	testCases := []struct {
 		name              string

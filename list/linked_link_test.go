@@ -90,6 +90,54 @@ func TestLinkedListSize(t *testing.T) {
 	}
 }
 
+func TestLinkedListClear(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() List
+		expectedResult List
+	}{
+		{
+			name: "test clear on creating an new Linked list",
+			actualResult: func() List {
+				ll := NewLinkedList()
+				ll.Clear()
+				return ll
+			},
+			expectedResult: NewLinkedList(),
+		},
+		{
+			name: "test clear on creating an new Linked list with elements",
+			actualResult: func() List {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+				ll.Clear()
+				return ll
+			},
+			expectedResult: NewLinkedList(),
+		},
+		{
+			name: "test clear on creating an new Linked list with 100 elements",
+			actualResult: func() List {
+				data := make([]int, 100)
+				for i := 0; i < 100; i++ {
+					data[i] = i
+				}
+				ll := NewLinkedList(data...)
+				ll.Clear()
+				return ll
+			},
+			expectedResult: NewLinkedList(),
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			size := testCase.actualResult()
+
+			assert.Equal(t, testCase.expectedResult, size)
+		})
+	}
+}
+
 func TestLinkedListAdd(t *testing.T) {
 	testCases := []struct {
 		name               string

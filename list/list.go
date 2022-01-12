@@ -9,6 +9,7 @@ type List interface {
 	Add(element int) bool
 	AddAll(elements ...int) bool
 	AddAt(index int, element int) bool
+	Clear()
 	Contains(element int) bool
 	ContainsAll(elements ...int) bool
 	GetAt(index int) int
@@ -23,7 +24,6 @@ type List interface {
 	RetainAll(elements ...int)
 	Set(index int, newElement int) bool
 	Size() int
-	//Clear()
 	//Clone()
 	//LastIndexOf()
 	//SubList()
