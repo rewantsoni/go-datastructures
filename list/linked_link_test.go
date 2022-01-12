@@ -970,7 +970,62 @@ func TestLinkedListSubList(t *testing.T) {
 					assert.Equal(t, expectedLinkedList.GetAt(i), resLinkedList.GetAt(i))
 				}
 			}
-			//assert.Equal(t, testCase.expectedLinkedList(), resLinkedList)
+		})
+	}
+}
+
+func TestLinkedListClone(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() (bool, List)
+		expectedResult func() (bool, List)
+	}{
+		{
+			name: "test clear on creating an new array list",
+			actualResult: func() (bool, List) {
+				ll := NewLinkedList()
+				return ll.Clone()
+			},
+			expectedResult: func() (bool, List) {
+				return true, NewLinkedList()
+			},
+		},
+		{
+			name: "test clear on creating an new linked list with elements",
+			actualResult: func() (bool, List) {
+				ll := NewLinkedList(1, 2, 3, 4, 5)
+				return ll.Clone()
+			},
+			expectedResult: func() (bool, List) {
+				return true, NewLinkedList(1, 2, 3, 4, 5)
+			},
+		},
+		{
+			name: "test clear on creating an new linked list with 100 elements",
+			actualResult: func() (bool, List) {
+				data := make([]int, 100)
+				for i := 0; i < 100; i++ {
+					data[i] = i
+				}
+				ll := NewLinkedList(data...)
+				return ll.Clone()
+			},
+			expectedResult: func() (bool, List) {
+				data := make([]int, 100)
+				for i := 0; i < 100; i++ {
+					data[i] = i
+				}
+				return true, NewLinkedList(data...)
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res, list := testCase.actualResult()
+			expectedRes, expectedList := testCase.expectedResult()
+			assert.Equal(t, expectedRes, res)
+			assert.Equal(t, expectedList, list)
 		})
 	}
 }

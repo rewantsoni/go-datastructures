@@ -60,6 +60,13 @@ func (ll *LinkedList) Clear() {
 	ll.size = 0
 }
 
+func (ll *LinkedList) Clone() (bool, List) {
+	if ll.IsEmpty() {
+		return true, NewLinkedList()
+	}
+	return ll.SubList(nought, ll.Size())
+}
+
 func (ll *LinkedList) Contains(element int) bool {
 	return ll.IndexOf(element) != -1
 }

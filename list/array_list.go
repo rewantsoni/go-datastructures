@@ -68,6 +68,13 @@ func (al *ArrayList) Clear() {
 	al.size = nought
 }
 
+func (al *ArrayList) Clone() (bool, List) {
+	if al.IsEmpty() {
+		return true, NewArrayList()
+	}
+	return al.SubList(nought, al.Size())
+}
+
 func (al *ArrayList) Contains(element int) bool {
 	return al.IndexOf(element) != -1
 }

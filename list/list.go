@@ -10,7 +10,7 @@ type List interface {
 	AddAll(elements ...int) bool
 	AddAt(index int, element int) bool
 	Clear()
-	//Clone() List
+	Clone() (bool, List)
 	Contains(element int) bool
 	ContainsAll(elements ...int) bool
 	GetAt(index int) int

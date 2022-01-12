@@ -1216,3 +1216,59 @@ func TestArrayListSubList(t *testing.T) {
 		})
 	}
 }
+
+func TestArrayListClone(t *testing.T) {
+	testCases := []struct {
+		name           string
+		actualResult   func() (bool, List)
+		expectedResult func() (bool, List)
+	}{
+		{
+			name: "test clear on creating an new array list",
+			actualResult: func() (bool, List) {
+				al := NewArrayList()
+				return al.Clone()
+			},
+			expectedResult: func() (bool, List) {
+				return true, NewArrayList()
+			},
+		},
+		{
+			name: "test clear on creating an new array list with elements",
+			actualResult: func() (bool, List) {
+				al := NewArrayList(1, 2, 3, 4, 5)
+				return al.Clone()
+			},
+			expectedResult: func() (bool, List) {
+				return true, NewArrayList(1, 2, 3, 4, 5)
+			},
+		},
+		{
+			name: "test clear on creating an new array list with 100 elements",
+			actualResult: func() (bool, List) {
+				data := make([]int, 100)
+				for i := 0; i < 100; i++ {
+					data[i] = i
+				}
+				al := NewArrayList(data...)
+				return al.Clone()
+			},
+			expectedResult: func() (bool, List) {
+				data := make([]int, 100)
+				for i := 0; i < 100; i++ {
+					data[i] = i
+				}
+				return true, NewArrayList(data...)
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res, list := testCase.actualResult()
+			expectedRes, expectedList := testCase.expectedResult()
+			assert.Equal(t, expectedRes, res)
+			assert.Equal(t, expectedList, list)
+		})
+	}
+}
