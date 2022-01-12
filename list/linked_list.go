@@ -42,14 +42,6 @@ func NewLinkedList(elements ...int) List {
 	return ll
 }
 
-func (ll *LinkedList) Size() int {
-	return ll.size
-}
-
-func (ll *LinkedList) IsEmpty() bool {
-	return ll.Size() == 0
-}
-
 func (ll *LinkedList) Add(element int) bool {
 	return ll.addAll(ll.Size(), element)
 }
@@ -60,14 +52,6 @@ func (ll *LinkedList) AddAll(elements ...int) bool {
 
 func (ll *LinkedList) AddAt(index int, element int) bool {
 	return ll.addAll(index, element)
-}
-
-func (ll *LinkedList) GetAt(index int) int {
-	if ll.IsEmpty() || index < 0 || index >= ll.Size() {
-		panic(fmt.Sprintf("panic: index %d is out of bound length is %d", index, ll.Size()))
-	}
-
-	return ll.traverseTo(index).data
 }
 
 func (ll *LinkedList) Contains(element int) bool {
@@ -83,36 +67,25 @@ func (ll *LinkedList) ContainsAll(elements ...int) bool {
 	return true
 }
 
+func (ll *LinkedList) GetAt(index int) int {
+	if ll.IsEmpty() || index < 0 || index >= ll.Size() {
+		panic(fmt.Sprintf("panic: index %d is out of bound length is %d", index, ll.Size()))
+	}
+
+	return ll.traverseTo(index).data
+}
+
 func (ll *LinkedList) IndexOf(element int) int {
 	return ll.find(element)
 }
 
-func (ll *LinkedList) Replace(oldElement int, newElement int) bool {
-	if ll.IsEmpty() {
-		return false
-	}
-
-	res := false
-	temp := ll.first
-	for temp != nil {
-		if temp.data == oldElement {
-			temp.data = newElement
-			res = true
-		}
-		temp = temp.next
-	}
-
-	return res
-
+func (ll *LinkedList) IsEmpty() bool {
+	return ll.Size() == 0
 }
 
-func (ll *LinkedList) Set(index int, newElement int) bool {
-	if ll.IsEmpty() || index < 0 || index >= ll.Size() {
-		return false
-	}
-
-	ll.traverseTo(index).data = newElement
-	return true
+func (ll *LinkedList) Iterator() iterator.Iterator {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (ll *LinkedList) Remove(element int) bool {
@@ -148,6 +121,11 @@ func (ll *LinkedList) Remove(element int) bool {
 	return false
 }
 
+func (ll *LinkedList) RemoveAll(elements ...int) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (ll *LinkedList) RemoveAt(index int) (int, bool) {
 	if ll.IsEmpty() || index < 0 || index >= ll.size {
 		return -1, false
@@ -180,24 +158,49 @@ func (ll *LinkedList) RemoveAt(index int) (int, bool) {
 	return temp, true
 }
 
+func (ll *LinkedList) Replace(oldElement int, newElement int) bool {
+	if ll.IsEmpty() {
+		return false
+	}
+
+	res := false
+	temp := ll.first
+	for temp != nil {
+		if temp.data == oldElement {
+			temp.data = newElement
+			res = true
+		}
+		temp = temp.next
+	}
+
+	return res
+
+}
+
+func (ll *LinkedList) ReplaceAll(operator operators.UnaryOperator) {
+	cur := ll.first
+	for cur != nil {
+		cur.data = operator.Apply(cur.data)
+		cur = cur.next
+	}
+}
+
 func (ll *LinkedList) RetainAll(elements ...int) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (ll *LinkedList) RemoveAll(elements ...int) {
-	//TODO implement me
-	panic("implement me")
+func (ll *LinkedList) Set(index int, newElement int) bool {
+	if ll.IsEmpty() || index < 0 || index >= ll.Size() {
+		return false
+	}
+
+	ll.traverseTo(index).data = newElement
+	return true
 }
 
-func (ll *LinkedList) ReplaceAll(operator operators.UnaryOperator) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (ll *LinkedList) Iterator() iterator.Iterator {
-	//TODO implement me
-	panic("implement me")
+func (ll *LinkedList) Size() int {
+	return ll.size
 }
 
 func (ll *LinkedList) String() string {

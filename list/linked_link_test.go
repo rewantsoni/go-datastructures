@@ -780,3 +780,53 @@ func TestLinkedListRemoveAt(t *testing.T) {
 		})
 	}
 }
+
+func TestLinkedListReplaceAll(t *testing.T) {
+
+	testCases := []struct {
+		name           string
+		actualResult   func() List
+		expectedResult func() List
+	}{
+		{
+			name: "test replace all when Linked is empty",
+			actualResult: func() List {
+				ll := NewLinkedList()
+				ll.ReplaceAll(testMultiply{Val: 2})
+				return ll
+			},
+			expectedResult: func() List {
+				return NewLinkedList()
+			},
+		},
+		{
+			name: "test replace all when function multiply and Linked not empty",
+			actualResult: func() List {
+				ll := NewLinkedList(1, 2, 3)
+				ll.ReplaceAll(testMultiply{Val: 2})
+				return ll
+			},
+			expectedResult: func() List {
+				return NewLinkedList(2, 4, 6)
+			},
+		},
+		{
+			name: "test replace all when add function and Linked not empty",
+			actualResult: func() List {
+				ll := NewLinkedList(1, 2, 3)
+				ll.ReplaceAll(testAdd{Val: 10})
+				return ll
+			},
+			expectedResult: func() List {
+				return NewLinkedList(11, 12, 13)
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			res := testCase.actualResult()
+			assert.Equal(t, testCase.expectedResult(), res)
+		})
+	}
+}
