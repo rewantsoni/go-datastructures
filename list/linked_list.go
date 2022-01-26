@@ -13,12 +13,6 @@ type node struct {
 	prev *node
 }
 
-func newNode(element int) *node {
-	return &node{
-		data: element,
-	}
-}
-
 type LinkedList struct {
 	size int
 
@@ -26,10 +20,22 @@ type LinkedList struct {
 	last  *node
 }
 
+type linkedListIterator struct {
+	currNode *node
+	ll       *LinkedList
+}
+
+func newNode(element int) *node {
+	return &node{
+		data: element,
+	}
+}
+
 func NewLinkedList(elements ...int) List {
 	ll := &LinkedList{
 		size:  nought,
 		first: nil,
+		last:  nil,
 	}
 
 	if len(elements) == 0 {
@@ -92,15 +98,22 @@ func (ll *LinkedList) IndexOf(element int) int {
 	return ll.find(element)
 }
 
+//TODO: test
 func (ll *LinkedList) IsEmpty() bool {
 	return ll.Size() == 0
 }
 
+//TODO: test
 func (ll *LinkedList) Iterator() iterator.Iterator {
-	//TODO implement me
-	panic("implement me")
+	return newLinkedListIterator(ll)
 }
 
+//TODO: test
+func (ll *LinkedList) LastIndexOf(element int) int {
+	return ll.findLast(element)
+}
+
+//TODO: make it more readable
 func (ll *LinkedList) Remove(element int) bool {
 
 	if ll.IsEmpty() {
@@ -134,11 +147,12 @@ func (ll *LinkedList) Remove(element int) bool {
 	return false
 }
 
+//TODO: test
 func (ll *LinkedList) RemoveAll(elements ...int) {
-	//TODO implement me
-	panic("implement me")
+	ll.filterLinkedList(false, elements...)
 }
 
+//TODO: make it more readable
 func (ll *LinkedList) RemoveAt(index int) (int, bool) {
 	if ll.IsEmpty() || index < 0 || index >= ll.size {
 		return -1, false
@@ -171,6 +185,7 @@ func (ll *LinkedList) RemoveAt(index int) (int, bool) {
 	return temp, true
 }
 
+//TODO: make it more readable
 func (ll *LinkedList) Replace(oldElement int, newElement int) bool {
 	if ll.IsEmpty() {
 		return false
@@ -198,9 +213,9 @@ func (ll *LinkedList) ReplaceAll(operator operators.UnaryOperator) {
 	}
 }
 
+//TODO: test
 func (ll *LinkedList) RetainAll(elements ...int) {
-	//TODO implement me
-	panic("implement me")
+	ll.filterLinkedList(true, elements...)
 }
 
 func (ll *LinkedList) Set(index int, newElement int) bool {
@@ -247,6 +262,22 @@ func (ll *LinkedList) String() string {
 	return sb.String()
 }
 
+//TODO: test
+func (lli *linkedListIterator) HasNext() bool {
+	return lli.currNode != nil
+}
+
+//TODO: test
+func (lli *linkedListIterator) Next() int {
+	if lli.currNode == nil {
+		panic("panic: linked list is empty")
+	}
+	temp := lli.currNode.data
+	lli.currNode = lli.currNode.next
+	return temp
+}
+
+//Helper Functions
 func (ll *LinkedList) addAll(index int, elements ...int) bool {
 	for i, element := range elements {
 		if !ll.add(index+i, element) {
@@ -256,6 +287,7 @@ func (ll *LinkedList) addAll(index int, elements ...int) bool {
 	return true
 }
 
+//TODO: make it more readable
 func (ll *LinkedList) add(index int, element int) bool {
 
 	if !(index >= 0 && index <= ll.Size()) {
@@ -316,4 +348,46 @@ func (ll *LinkedList) find(element int) int {
 		temp = temp.next
 	}
 	return -1
+}
+
+func (ll *LinkedList) findLast(element int) int {
+	temp := ll.last
+	for i := ll.Size() - 1; i > 0; i-- {
+		if temp.data == element {
+			return i
+		}
+		temp = temp.prev
+	}
+	return -1
+}
+
+func (ll *LinkedList) filterLinkedList(retain bool, elements ...int) {
+	cache := map[int]bool{}
+
+	for _, e := range elements {
+		cache[e] = true
+	}
+
+	cur := ll.first
+
+	for cur != nil {
+		if cache[cur.data] {
+			if !retain {
+				//can pass node and delete wrt node
+				ll.Remove(cur.data)
+			}
+		} else {
+			if retain {
+				ll.Remove(cur.data)
+			}
+		}
+		cur = cur.next
+	}
+}
+
+func newLinkedListIterator(ll *LinkedList) *linkedListIterator {
+	return &linkedListIterator{
+		currNode: ll.first,
+		ll:       ll,
+	}
 }

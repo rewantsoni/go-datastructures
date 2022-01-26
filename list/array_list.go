@@ -42,13 +42,6 @@ func NewArrayList(elements ...int) List {
 	return al
 }
 
-func newArrayListIterator(al *ArrayList) *arrayListIterator {
-	return &arrayListIterator{
-		currentIndex: 0,
-		al:           al,
-	}
-}
-
 func (al *ArrayList) Add(element int) bool {
 	return al.addAll(al.Size(), element)
 }
@@ -100,12 +93,18 @@ func (al *ArrayList) IndexOf(element int) int {
 	return al.find(element)
 }
 
+//TODO: test
 func (al *ArrayList) IsEmpty() bool {
 	return al.Size() == 0
 }
 
 func (al *ArrayList) Iterator() iterator.Iterator {
 	return newArrayListIterator(al)
+}
+
+//TODO: test
+func (al *ArrayList) LastIndexOf(element int) int {
+	return al.findLast(element)
 }
 
 func (al *ArrayList) Remove(element int) bool {
@@ -212,6 +211,7 @@ func (ali *arrayListIterator) Next() int {
 	return e
 }
 
+//Helper Functions
 func (al *ArrayList) checkAndIncreaseLimit() {
 	if al.Size() >= int(float64(al.capacity)*al.upperLoadFactor) {
 		al.capacity *= al.scalingFactor
@@ -261,6 +261,20 @@ func (al *ArrayList) find(element int) int {
 	}
 
 	for i := 0; i < al.Size(); i++ {
+		if al.data[i] == element {
+			return i
+		}
+	}
+	return -1
+}
+
+func (al *ArrayList) findLast(element int) int {
+
+	if al.IsEmpty() {
+		return -1
+	}
+
+	for i := al.Size() - 1; i > 0; i-- {
 		if al.data[i] == element {
 			return i
 		}
@@ -318,4 +332,11 @@ func resize(capacity int, data []int) []int {
 		temp[i] = data[i]
 	}
 	return temp
+}
+
+func newArrayListIterator(al *ArrayList) *arrayListIterator {
+	return &arrayListIterator{
+		currentIndex: 0,
+		al:           al,
+	}
 }

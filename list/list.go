@@ -17,6 +17,7 @@ type List interface {
 	IndexOf(element int) int
 	IsEmpty() bool
 	Iterator() iterator.Iterator
+	LastIndexOf(element int) int
 	Remove(element int) bool
 	RemoveAt(index int) (int, bool)
 	RemoveAll(elements ...int)
@@ -26,6 +27,4 @@ type List interface {
 	Set(index int, newElement int) bool
 	Size() int
 	SubList(start, end int) (bool, List)
-	//LastIndexOf()
-	//SubList()
 }
