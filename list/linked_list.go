@@ -31,7 +31,7 @@ func newNode(element int) *node {
 	}
 }
 
-func NewLinkedList(elements ...int) List {
+func NewLinkedList(elements ...int) *LinkedList {
 	ll := &LinkedList{
 		size:  nought,
 		first: nil,
@@ -58,6 +58,11 @@ func (ll *LinkedList) AddAll(elements ...int) bool {
 
 func (ll *LinkedList) AddAt(index int, element int) bool {
 	return ll.addAll(index, element)
+}
+
+//TODO: test
+func (ll *LinkedList) AddFirst(element int) bool {
+	return ll.addAll(0, element)
 }
 
 func (ll *LinkedList) Clear() {
@@ -92,6 +97,11 @@ func (ll *LinkedList) GetAt(index int) int {
 	}
 
 	return ll.traverseTo(index).data
+}
+
+//TODO: test
+func (ll *LinkedList) GetFirst() int {
+	return ll.GetAt(0)
 }
 
 func (ll *LinkedList) IndexOf(element int) int {
@@ -152,10 +162,18 @@ func (ll *LinkedList) RemoveAll(elements ...int) {
 	ll.filterLinkedList(false, elements...)
 }
 
-//TODO: make it more readable
+//TODO: make it more readable || all cases not covered
 func (ll *LinkedList) RemoveAt(index int) (int, bool) {
 	if ll.IsEmpty() || index < 0 || index >= ll.size {
 		return -1, false
+	}
+
+	if index == 0 && ll.Size() == 1 {
+		temp := ll.first.data
+		ll.first = nil
+		ll.last = nil
+		ll.size--
+		return temp, true
 	}
 
 	if index == 0 {
@@ -183,6 +201,15 @@ func (ll *LinkedList) RemoveAt(index int) (int, bool) {
 	cur.next.prev = cur.prev
 	ll.size--
 	return temp, true
+}
+
+//TODO: handle it properly, return painc in removeAt
+func (ll *LinkedList) RemoveFirst() int {
+	result, ok := ll.RemoveAt(0)
+	if !ok {
+		panic("stack is empty")
+	}
+	return result
 }
 
 //TODO: make it more readable
