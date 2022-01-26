@@ -62,7 +62,12 @@ func (ll *LinkedList) AddAt(index int, element int) bool {
 
 //TODO: test
 func (ll *LinkedList) AddFirst(element int) bool {
-	return ll.addAll(0, element)
+	return ll.AddAt(0, element)
+}
+
+//TODO: test
+func (ll *LinkedList) AddLast(element int) bool {
+	return ll.AddAt(ll.size, element)
 }
 
 func (ll *LinkedList) Clear() {
@@ -206,6 +211,15 @@ func (ll *LinkedList) RemoveAt(index int) (int, bool) {
 //TODO: handle it properly, return painc in removeAt
 func (ll *LinkedList) RemoveFirst() int {
 	result, ok := ll.RemoveAt(0)
+	if !ok {
+		panic("stack is empty")
+	}
+	return result
+}
+
+//TODO: handle it properly, return painc in removeAt
+func (ll *LinkedList) RemoveLast() int {
+	result, ok := ll.RemoveAt(ll.Size())
 	if !ok {
 		panic("stack is empty")
 	}
